@@ -26,7 +26,7 @@ time
 
 -Install missing modules using pip
 
--In case of network or connection errors the program doesnt't crash and will keep retrying infinitely
+-In case of network or connection errors the program doesn't crash and will keep retrying infinitely
 
 -If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
