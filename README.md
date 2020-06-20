@@ -1,4 +1,4 @@
-# Python-NSE-Option-Chain-Analyzer
+# Python NSE-Option-Chain-Analyzer
 
 ### [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 
