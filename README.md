@@ -57,7 +57,7 @@ csv
 
 -Export to .csv file option
 
--About window with version and links for developer Github profile, README, license, releases and sources
+-About window with version and links for developer GitHub profile, README, license, releases and sources
 
 -PEP 8 format
 
