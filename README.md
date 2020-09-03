@@ -8,11 +8,7 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 ## Usage:
 
--Open Option Chain (Equity Derivatives) page on https://www1.nseindia.com/
-
--Select your Index or Underlying Stock and Expiry Date on the website
-
--Run the program and enter the current URL from the browser and your preferred Strike Price
+-Select your Index and Expiry Date and enter your preferred Strike Price
 
 -You can select all table data using Ctrl+A or select individual cells, rows and columns 
 
@@ -29,29 +25,31 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 ```
 tkinter
 tksheet
-bs4
-requests
 pandas
 datetime
 webbrowser
 csv
+requests
+json
 ```
 
--Install missing modules using pip
+-Install missing modules using `pip install module_name`
 
 -In case of network or connection errors the program doesn't crash and will keep retrying infinitely
 
 -If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
+-All data is retrieved from `https://www.nseindia.com/api/option-chain-indices?symbol=*index_name*`
+
 ## Features:
 
--The program infinitely refreshes every 30 seconds
+-The program infinitely refreshes every minute
 
 -New data is displayed only if the server time has increased (To prevent printing duplicate data)
 
 -Red and Green colour indication for data based on trends
 
--Program title format: NSE-Option-Chain-Analyzer - {underlying_stock} - {expiry_date} - {strike_price}
+-Program title format: NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}
 
 -Stop and Start functionality
 
@@ -60,6 +58,8 @@ csv
 -About window with version and links for developer GitHub profile, README, license, releases and sources
 
 -PEP 8 format
+
+-Object Oriented
 
 -Table Data displayed:
 
@@ -91,7 +91,7 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 ## Screenshots:
 
-![Screenshot_1](https://i.imgur.com/JEUKcMp.png)
+![Screenshot_1](https://i.imgur.com/2heigvk.png)
 
 ![Screenshot_2](https://i.imgur.com/rwJeMmT.png)
 
