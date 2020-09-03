@@ -7,7 +7,6 @@ import datetime
 import webbrowser
 import csv
 import requests
-import json
 
 
 # noinspection PyAttributeOutsideInit
@@ -51,7 +50,8 @@ class Nse:
         if response is not None:
             try:
                 json_data = response.json()
-            except json.decoder.JSONDecodeError:
+            except Exception as err:
+                print(err)
                 json_data = {}
         else:
             json_data = {}
