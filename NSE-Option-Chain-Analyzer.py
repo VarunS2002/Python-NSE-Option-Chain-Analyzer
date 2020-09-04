@@ -167,7 +167,7 @@ class Nse:
         except Exception as err:
             print(err)
             messagebox.showerror(title="Export Failed",
-                                 message="An error occurred while exporting the data URL.")
+                                 message="An error occurred while exporting the data.")
 
     def links(self, link, event="empty"):
 
