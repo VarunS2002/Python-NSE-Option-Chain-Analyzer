@@ -45,6 +45,8 @@ json
 
 -The program infinitely refreshes every minute
 
+-Supported Indexes : NIFTY, BANKNIFTY and NIFTYIT
+
 -New data is displayed only if the server time has increased (To prevent printing duplicate data)
 
 -Red and Green colour indication for data based on trends
