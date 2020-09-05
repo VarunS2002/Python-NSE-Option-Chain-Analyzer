@@ -104,10 +104,18 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 ## Screenshots:
 
+-Login Page:
+
 ![Screenshot_1](https://i.imgur.com/2heigvk.png)
+
+-Main Window:
 
 ![Screenshot_2](https://i.imgur.com/rwJeMmT.png)
 
+-Selecting data:
+
 ![Screenshot_3](https://i.imgur.com/O4kNI2Y.png)
+
+-Option Menu
 
 ![Screenshot_4](https://i.imgur.com/Hwbep1G.png)
