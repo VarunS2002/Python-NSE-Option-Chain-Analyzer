@@ -212,7 +212,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val = Label(self.info, text="3.0", relief=RIDGE)
+        version_val = Label(self.info, text="3.1", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -593,7 +593,13 @@ class Nse:
         c2 = b2.get((index + 1), 'Change in Open Interest')
         b3 = df.iloc[:, 1]
         c3 = b3.get((index + 2), 'Change in Open Interest')
+        if isinstance(c2, str):
+            c2 = 0
+        if isinstance(c3, str):
+            c3 = 0
         self.call_sum = round((c1 + c2 + c3) / 1000, 1)
+        if self.call_sum == -0:
+            self.call_sum = 0.0
         self.call_boundary = round(c3 / 1000, 1)
 
         o1 = a.iloc[:, 1]
@@ -606,21 +612,33 @@ class Nse:
         self.p5 = o3.get((index + 4), 'Change in Open Interest')
         self.p6 = o3.get((index - 2), 'Change in Open Interest')
         self.p7 = o2.get((index - 2), 'Change in Open Interest')
+        if isinstance(p2, str):
+            p2 = 0
+        if isinstance(p3, str):
+            p3 = 0
+        if isinstance(self.p4, str):
+            self.p4 = 0
+        if isinstance(self.p5, str):
+            self.p5 = 0
         self.put_sum = round((p1 + p2 + p3) / 1000, 1)
         self.put_boundary = round(p1 / 1000, 1)
         self.difference = round(self.call_sum - self.put_sum, 1)
         if self.p5 == 0:
-            self.call_itm = 0
+            self.call_itm = 0.0
         else:
             self.call_itm = round(self.p4 / self.p5, 1)
             if self.call_itm == -0:
-                self.call_itm = 0
+                self.call_itm = 0.0
+        if isinstance(self.p6, str):
+            self.p6 = 0
+        if isinstance(self.p7, str):
+            self.p7 = 0
         if self.p7 == 0:
-            self.put_itm = 0
+            self.put_itm = 0.0
         else:
             self.put_itm = round(self.p6 / self.p7, 1)
             if self.put_itm == -0:
-                self.put_itm = 0
+                self.put_itm = 0.0
 
         if self.stop:
             return
