@@ -2,7 +2,6 @@
 
 ### [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Python: 3.6+](https://img.shields.io/badge/Python-3.6%2B-blue)](https://www.python.org/downloads)
 ![Build: passing](https://img.shields.io/badge/build-passing-brightgreen)
 
 For doing technical analysis for option traders, the Option Chain is the most important tool for deciding entry and exit strategies.
@@ -11,30 +10,48 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 ## Installation:
 
--Python 3.6+ from https://www.python.org/downloads/ (recommended)
+-Types of variants available:
+ 
+ 1. .py (Python Source Code)
+ 
+ 2. .pyw (Compiled Python file without Console)
+ 
+ 3. .exe (Windows Executable)
 
--Add Python to PATH during installation in Windows (recommended)
+-Requirements for 3 (BETA):
+ 
+ - Windows OS  
 
--Required modules:
+-Requirements for 1 and 2:
+ 
+ - Python 3.6+ 
+ 
+ - For Windows https://www.python.org/downloads/ is recommended
 
-```
-tkinter
-tksheet
-pandas
-datetime
-webbrowser
-csv
-requests
-json
-```
+ - Add Python to PATH/Environment Variables during installation in Windows (recommended)
 
--Install missing modules using `pip install module_name`
+ - Required modules:
+
+    ```
+    tkinter
+    tksheet
+    pandas
+    datetime
+    webbrowser
+    csv
+    requests
+    json
+    ```
+    
+  - Install missing modules using `pip install module_name`
 
 ## Usage:
 
--Select your Index or Security option and it's  Expiry Date
+1. Select your Index or Security option and it's Expiry Date
 
--Enter your preferred Strike Price 
+2. Enter your preferred Strike Price 
+
+3. Click Start
 
 ## Note:
 
@@ -45,6 +62,8 @@ json
 -If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
 -All data is retrieved from `https://www.nseindia.com/api/option-chain-indices?symbol=*index_name*`
+
+-[auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
 
 ## Features:
 
