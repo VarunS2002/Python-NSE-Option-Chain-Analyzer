@@ -71,11 +71,14 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 -New data row is added only if the NSE server updates its time or data (To prevent printing duplicate data)
 
--Supported Indexes : NIFTY, BANKNIFTY and NIFTYIT
+-Supported Indexes :
+ * NIFTY
+ * BANKNIFTY
+ * NIFTYIT
 
 -Red and Green colour indication for data based on trends
 
--Program title format: NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}
+-Program title format: `NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}`
 
 -Stop and Start functionality
 
