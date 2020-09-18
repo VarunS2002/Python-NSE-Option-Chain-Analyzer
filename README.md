@@ -1,8 +1,11 @@
 # Python NSE-Option-Chain-Analyzer
 
-### [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
+[![New-Site: v3.2](https://img.shields.io/badge/New--Site-v3.2-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.2)
+[![Old-Site: v2.0](https://img.shields.io/badge/Old--Site-v2.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
+![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 ![Build: passing](https://img.shields.io/badge/build-passing-brightgreen)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 For doing technical analysis for option traders, the Option Chain is the most important tool for deciding entry and exit strategies.
 The National Stock Exchange (NSE) has a website which displays the option chain for traders in near real-time. This program scrapes this data from the NSE site and then generates useful analysis of the Option Chain for the specified Security or Index from the NSE website.
