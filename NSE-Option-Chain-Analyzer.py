@@ -13,6 +13,8 @@ import requests
 class Nse:
     def __init__(self, window):
         self.seconds = 60
+        self.previous_date = None
+        self.previous_time = None
         self.first_run = True
         self.stop = False
         self.dates = [""]
@@ -44,7 +46,6 @@ class Nse:
                 response = requests.get(url, headers=self.headers, timeout=5)
             except Exception as err:
                 print(err)
-                self.root.after((self.seconds * 1000), self.main)
                 return
 
         if response is not None:
@@ -64,7 +65,6 @@ class Nse:
             self.date_menu.current(0)
             return
         elif json_data == {}:
-            self.root.after((self.seconds * 1000), self.main)
             return
 
         if self.first_run:
@@ -212,7 +212,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val = Label(self.info, text="3.1", relief=RIDGE)
+        version_val = Label(self.info, text="3.2", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -252,7 +252,7 @@ class Nse:
         window_height = self.root.winfo_reqheight()
         position_right = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down = int(self.root.winfo_screenheight() / 3 - window_height / 2)
-        self.root.geometry("910x510+{}+{}".format(position_right, position_down))
+        self.root.geometry("815x510+{}+{}".format(position_right, position_down))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -277,10 +277,11 @@ class Nse:
         top_frame.pack(fill="both", expand=True)
 
         output_columns = (
-            'Time', 'Points', 'Call Sum', 'Put Sum', 'Difference', 'Call Boundary', 'Put Boundary', 'Call ITM',
-            'Put ITM')
-        self.sheet = tksheet.Sheet(top_frame, column_width=95, align="center", headers=output_columns,
-                                   header_font=("TkDefaultFont", 9, "bold"), empty_horizontal=0, empty_vertical=20)
+            'Time', 'Points', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
+            'Put Boundary\n(in K)', 'Call ITM', 'Put ITM')
+        self.sheet = tksheet.Sheet(top_frame, column_width=85, align="center", headers=output_columns,
+                                   header_font=("TkDefaultFont", 9, "bold"), empty_horizontal=0,
+                                   empty_vertical=20, header_height=35)
         self.sheet.enable_bindings(
             ("toggle_select", "drag_select", "column_select", "row_select", "column_width_resize",
              "arrowkeys", "right_click_popup_menu", "rc_select", "copy", "select_all"))
@@ -380,6 +381,11 @@ class Nse:
         pe_data = pandas.DataFrame(pe_values)
         ce_data_f = ce_data.loc[ce_data['expiryDate'] == self.expiry_date]
         pe_data_f = pe_data.loc[pe_data['expiryDate'] == self.expiry_date]
+        if ce_data_f.empty:
+            messagebox.showerror(title="Error",
+                                 message="Invalid Expiry Date.\nPlease restart and enter a new Expiry Date.")
+            self.change_state()
+            return
         columns_ce = ['openInterest', 'changeinOpenInterest', 'totalTradedVolume', 'impliedVolatility', 'lastPrice',
                       'change', 'bidQty', 'bidprice', 'askPrice', 'askQty', 'strikePrice']
         columns_pe = ['strikePrice', 'bidQty', 'bidprice', 'askPrice', 'askQty', 'change', 'lastPrice',
@@ -544,15 +550,20 @@ class Nse:
             return
 
         self.str_current_time = current_time.split(" ")[1]
-        current_time = datetime.datetime.strptime(self.str_current_time, '%H:%M:%S').time()
-
+        current_date = datetime.datetime.strptime(current_time.split(" ")[0], '%d-%b-%Y').date()
+        current_time = datetime.datetime.strptime(current_time.split(" ")[1], '%H:%M:%S').time()
         if self.first_run:
+            self.previous_date = current_date
             self.previous_time = current_time
-        elif current_time > self.previous_time:
+        elif current_date > self.previous_date:
+            self.previous_date = current_date
             self.previous_time = current_time
-        else:
-            self.root.after((self.seconds * 1000), self.main)
-            return
+        elif current_date == self.previous_date:
+            if current_time > self.previous_time:
+                self.previous_time = current_time
+            else:
+                self.root.after((self.seconds * 1000), self.main)
+                return
 
         call_oi_list = []
         for i in range(len(df)):
