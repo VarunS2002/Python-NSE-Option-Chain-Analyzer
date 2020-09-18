@@ -101,7 +101,7 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 Data | How it's calculated
 --- | ---
 Server Time | *Web Scraped*. Indicates last data update time by NSE server 
-Underlying Instrument Value | *Web Scraped*. Indicates the value of the underlying Security or Index
+Points | *Web Scraped*. Underlying Instrument Value indicates the value of the underlying Security or Index
 Call Sum | Calculated. Sum of the Changes in Call Open Interest contracts of the given Strike Price and the next immediate two Strike Prices (In Thousands)
 Put Sum | Calculated. Sum of the Change in Put Open Interest contracts of the given Strike Price and the next two Strike Prices (In Thousands)
 Difference | Calculated. Difference between the Call Sum and Put Sum. If its very -ve its bullish, if its very +ve then its bearish else its a sideways session. 
@@ -132,12 +132,12 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 -Main Window:
 
-![Screenshot_2](https://i.imgur.com/rwJeMmT.png)
+![Screenshot_2](https://i.imgur.com/SjD6fPX.png)
 
 -Selecting data:
 
-![Screenshot_3](https://i.imgur.com/O4kNI2Y.png)
+![Screenshot_3](https://i.imgur.com/dHbYAr3.png)
 
 -Option Menu
 
-![Screenshot_4](https://i.imgur.com/Hwbep1G.png)
+![Screenshot_4](https://i.imgur.com/B731pUk.png)
