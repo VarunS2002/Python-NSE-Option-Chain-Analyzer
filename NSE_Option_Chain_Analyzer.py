@@ -18,22 +18,30 @@ class Nse:
         self.first_run = True
         self.stop = False
         self.dates = [""]
-        self.indexes = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
+        self.indices = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
         self.headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                                       'like Gecko) '
                                       'Chrome/80.0.3987.149 Safari/537.36',
                         'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
+        self.session = requests.Session()
+        self.cookies = {}
         self.login_win(window)
 
-    def get_data(self, event="empty"):
+    def get_data(self, event=None):
+        request = None
         response = None
         if self.first_run:
             self.index = self.index_var.get()
             try:
+                url_oc = "https://www.nseindia.com/option-chain"
                 url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                response = requests.get(url, headers=self.headers, timeout=5)
+                request = self.session.get(url_oc, headers=self.headers, timeout=5)
+                self.cookies = dict(request.cookies)
+                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
             except Exception as err:
-                print(err)
+                print(request.status_code)
+                print(response.status_code)
+                print(err, "1")
                 messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
                 self.dates.clear()
                 self.dates = [""]
@@ -43,16 +51,18 @@ class Nse:
         else:
             try:
                 url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                response = requests.get(url, headers=self.headers, timeout=5)
+                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
             except Exception as err:
-                print(err)
+                print(response)
+                print(err, "2")
                 return
 
         if response is not None:
             try:
                 json_data = response.json()
             except Exception as err:
-                print(err)
+                print(response)
+                print(err, "3")
                 json_data = {}
         else:
             json_data = {}
@@ -61,8 +71,11 @@ class Nse:
             messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
             self.dates.clear()
             self.dates = [""]
-            self.date_menu.config(values=tuple(self.dates))
-            self.date_menu.current(0)
+            try:
+                self.date_menu.config(values=tuple(self.dates))
+                self.date_menu.current(0)
+            except TclError as err:
+                print(err, "4")
             return
         elif json_data == {}:
             return
@@ -74,8 +87,8 @@ class Nse:
             try:
                 self.date_menu.config(values=tuple(self.dates))
                 self.date_menu.current(0)
-            except TclError:
-                pass
+            except TclError as err:
+                print(err, "5")
 
         return response, json_data
 
@@ -89,13 +102,13 @@ class Nse:
         self.login.geometry("260x90+{}+{}".format(position_right, position_down))
 
         self.index_var = StringVar()
-        self.index_var.set(self.indexes[0])
+        self.index_var.set(self.indices[0])
         self.dates_var = StringVar()
         self.dates_var.set(self.dates[0])
 
         index_label = Label(self.login, text="Index: ", justify=LEFT)
         index_label.grid(row=0, column=0, sticky=N + S + W)
-        self.index_menu = Combobox(self.login, textvariable=self.index_var, values=self.indexes)
+        self.index_menu = Combobox(self.login, textvariable=self.index_var, values=self.indices)
         self.index_menu.config(width=15)
         self.index_menu.grid(row=0, column=1, sticky=N + S + E)
         date_label = Label(self.login, text="Expiry Date: ", justify=LEFT)
@@ -128,7 +141,7 @@ class Nse:
 
         self.login.mainloop()
 
-    def start(self, event="empty"):
+    def start(self, event=None):
         self.expiry_date = self.dates_var.get()
         if self.expiry_date == "":
             messagebox.showerror(title="Error", message="Incorrect Expiry Date.\nPlease enter correct Expiry Date.")
@@ -138,10 +151,10 @@ class Nse:
             self.login.destroy()
             self.main_win()
         except ValueError as err:
-            print(err)
+            print(err, "6")
             messagebox.showerror(title="Error", message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
 
-    def change_state(self, event="empty"):
+    def change_state(self, event=None):
 
         if not self.stop:
             self.stop = True
@@ -154,7 +167,7 @@ class Nse:
 
             self.main()
 
-    def export(self, event="empty"):
+    def export(self, event=None):
         sheet_data = self.sheet.get_sheet_data()
 
         try:
@@ -165,11 +178,11 @@ class Nse:
             messagebox.showinfo(title="Export Complete",
                                 message="Data has been exported to NSE-Option-Chain-Analyzer.csv.")
         except Exception as err:
-            print(err)
+            print(err, "7")
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
-    def links(self, link, event="empty"):
+    def links(self, link, event=None):
 
         if link == "developer":
             webbrowser.open_new("https://github.com/VarunS2002/")
@@ -198,7 +211,7 @@ class Nse:
 
         return self.info
 
-    def about(self, event="empty"):
+    def about(self, event=None):
         self.info = self.about_window()
         self.info.rowconfigure(0, weight=1)
         self.info.rowconfigure(1, weight=1)
@@ -212,7 +225,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val = Label(self.info, text="3.2", relief=RIDGE)
+        version_val = Label(self.info, text="3.3", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -234,10 +247,11 @@ class Nse:
 
         self.info.mainloop()
 
-    def close(self, event="empty"):
+    def close(self, event=None):
         ask_quit = messagebox.askyesno("Quit", "All unsaved data will be lost.\nProceed to quit?", icon='warning',
                                        default='no')
         if ask_quit:
+            self.session.close()
             self.root.destroy()
             quit()
         elif not ask_quit:
@@ -277,7 +291,7 @@ class Nse:
         top_frame.pack(fill="both", expand=True)
 
         output_columns = (
-            'Time', 'Points', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
+            'Time', 'Value', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
             'Put Boundary\n(in K)', 'Call ITM', 'Put ITM')
         self.sheet = tksheet.Sheet(top_frame, column_width=85, align="center", headers=output_columns,
                                    header_font=("TkDefaultFont", 9, "bold"), empty_horizontal=0,
@@ -311,7 +325,7 @@ class Nse:
         max_call_oi_sp_label.grid(row=1, column=0, sticky=N + S + W + E)
         self.max_call_oi_sp_val = Label(bottom_frame, text="", relief=RIDGE)
         self.max_call_oi_sp_val.grid(row=1, column=1, sticky=N + S + W + E)
-        max_call_oi_label = Label(bottom_frame, text="OI:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
+        max_call_oi_label = Label(bottom_frame, text="OI (in K):", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
         max_call_oi_label.grid(row=1, column=2, sticky=N + S + W + E)
         self.max_call_oi_val = Label(bottom_frame, text="", relief=RIDGE)
         self.max_call_oi_val.grid(row=1, column=3, sticky=N + S + W + E)
@@ -322,7 +336,7 @@ class Nse:
         max_put_oi_sp_label.grid(row=1, column=4, sticky=N + S + W + E)
         self.max_put_oi_sp_val = Label(bottom_frame, text="", relief=RIDGE)
         self.max_put_oi_sp_val.grid(row=1, column=5, sticky=N + S + W + E)
-        max_put_oi_label = Label(bottom_frame, text="OI:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
+        max_put_oi_label = Label(bottom_frame, text="OI (in K):", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
         max_put_oi_label.grid(row=1, column=6, sticky=N + S + W + E)
         self.max_put_oi_val = Label(bottom_frame, text="", relief=RIDGE)
         self.max_put_oi_val.grid(row=1, column=7, sticky=N + S + W + E)
@@ -591,7 +605,8 @@ class Nse:
 
         try:
             index = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
-        except IndexError:
+        except IndexError as err:
+            print(err, "8")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
@@ -661,7 +676,12 @@ class Nse:
         self.root.after((self.seconds * 1000), self.main)
         return
 
+    @staticmethod
+    def create_instance():
+        master_window = Tk()
+        Nse(master_window)
+        master_window.mainloop()
 
-master_window = Tk()
-gui = Nse(master_window)
-master_window.mainloop()
+
+if __name__ == '__main__':
+    Nse.create_instance()
