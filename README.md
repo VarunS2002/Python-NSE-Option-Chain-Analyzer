@@ -1,7 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![New-Site: v3.2](https://img.shields.io/badge/New--Site-v3.2-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.2)
+[![New-Site: v3.3](https://img.shields.io/badge/New--Site-v3.3-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.3)
 [![Old-Site: v2.0](https://img.shields.io/badge/Old--Site-v2.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 ![Build: passing](https://img.shields.io/badge/build-passing-brightgreen)
@@ -15,11 +15,11 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 -Types of variants available:
  
- 1. .py (Python Source Code)
+ 1. `.py` (Python Source Code)
  
- 2. .pyw (Compiled Python file without Console)
+ 2. `.pyw` (Compiled Python file without Console)
  
- 3. .exe (Windows Executable)
+ 3. `.exe` (Windows Executable)
 
 -Requirements for 3 (BETA):
  
@@ -32,6 +32,8 @@ It also continuously refreshes the Option Chain and visually displays the trend 
  - For Windows https://www.python.org/downloads/ is recommended
 
  - Add Python to PATH/Environment Variables during installation in Windows (recommended)
+ 
+ - To run the Compiled Python file with Console change the extension to `.pyc` 
 
  - Required modules:
 
@@ -74,7 +76,7 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 -New data row is added only if the NSE server updates its time or data (To prevent printing duplicate data)
 
--Supported Indexes :
+-Supported Indices :
  * NIFTY
  * BANKNIFTY
  * NIFTYIT
@@ -104,7 +106,7 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 Data | How it's calculated
 --- | ---
 Server Time | *Web Scraped*. Indicates last data update time by NSE server 
-Points | *Web Scraped*. Underlying Instrument Value indicates the value of the underlying Security or Index
+Value | *Web Scraped*. Underlying Instrument Value indicates the value of the underlying Security or Index
 Call Sum | Calculated. Sum of the Changes in Call Open Interest contracts of the given Strike Price and the next immediate two Strike Prices (In Thousands)
 Put Sum | Calculated. Sum of the Change in Put Open Interest contracts of the given Strike Price and the next two Strike Prices (In Thousands)
 Difference | Calculated. Difference between the Call Sum and Put Sum. If its very -ve its bullish, if its very +ve then its bearish else its a sideways session. 
@@ -135,12 +137,12 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 -Main Window:
 
-![Screenshot_2](https://i.imgur.com/SjD6fPX.png)
+![Screenshot_2](https://i.imgur.com/2JO5BuT.png)
 
 -Selecting data:
 
-![Screenshot_3](https://i.imgur.com/dHbYAr3.png)
+![Screenshot_3](https://i.imgur.com/wxoEyPZ.png)
 
 -Option Menu
 
-![Screenshot_4](https://i.imgur.com/B731pUk.png)
+![Screenshot_4](https://i.imgur.com/gGIQz9a.png)
