@@ -7,22 +7,28 @@ import datetime
 import webbrowser
 import csv
 import requests
+import sys
+import streamtologger
 
 
 # noinspection PyAttributeOutsideInit
 class Nse:
-    def __init__(self, window):
+    def __init__(self, window: Tk):
         self.seconds = 60
+        self.stdout = sys.stdout
+        self.stderr = sys.stderr
         self.previous_date = None
         self.previous_time = None
         self.first_run = True
         self.stop = False
+        self.logging = False
         self.dates = [""]
         self.indices = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
         self.headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                                       'like Gecko) '
                                       'Chrome/80.0.3987.149 Safari/537.36',
                         'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
+        self.url_oc = "https://www.nseindia.com/option-chain"
         self.session = requests.Session()
         self.cookies = {}
         self.login_win(window)
@@ -33,14 +39,13 @@ class Nse:
         if self.first_run:
             self.index = self.index_var.get()
             try:
-                url_oc = "https://www.nseindia.com/option-chain"
                 url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                request = self.session.get(url_oc, headers=self.headers, timeout=5)
+                request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
                 self.cookies = dict(request.cookies)
                 response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
             except Exception as err:
-                print(request.status_code)
-                print(response.status_code)
+                print(request)
+                print(response)
                 print(err, "1")
                 messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
                 self.dates.clear()
@@ -52,7 +57,16 @@ class Nse:
             try:
                 url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
                 response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+                if response.status_code == 401:
+                    self.session.close()
+                    self.session = requests.Session()
+                    url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
+                    request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
+                    self.cookies = dict(request.cookies)
+                    response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+                    print("reset cookies")
             except Exception as err:
+                print(request)
                 print(response)
                 print(err, "2")
                 return
@@ -92,7 +106,7 @@ class Nse:
 
         return response, json_data
 
-    def login_win(self, window):
+    def login_win(self, window: Tk):
         self.login = window
         self.login.title("NSE")
         window_width = self.login.winfo_reqwidth()
@@ -127,7 +141,7 @@ class Nse:
         self.sp_entry.focus_set()
         self.get_data()
 
-        def focus_widget(event, mode):
+        def focus_widget(event, mode: int):
             if mode == 1:
                 self.get_data()
                 self.date_menu.focus_set()
@@ -182,7 +196,21 @@ class Nse:
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
-    def links(self, link, event=None):
+    def log(self, event=None):
+        if not self.logging:
+            streamtologger.redirect(target="nse.log", header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
+            self.logging = True
+            self.options.entryconfig(self.options.index(2), label="Logging: On   (Ctrl+L)")
+            messagebox.showinfo(title="Started", message="Debug Logging has been enabled.")
+        elif self.logging:
+            sys.stdout = self.stdout
+            sys.stderr = self.stderr
+            streamtologger._is_redirected = False
+            self.logging = False
+            self.options.entryconfig(self.options.index(2), label="Logging: Off   (Ctrl+L)")
+            messagebox.showinfo(title="Stopped", message="Debug Logging has been disabled.")
+
+    def links(self, link: str, event=None):
 
         if link == "developer":
             webbrowser.open_new("https://github.com/VarunS2002/")
@@ -197,7 +225,7 @@ class Nse:
 
         self.info.attributes('-topmost', False)
 
-    def about_window(self):
+    def about_window(self) -> Toplevel:
         self.info = Toplevel()
         self.info.title("About")
         window_width = self.info.winfo_reqwidth()
@@ -225,7 +253,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val = Label(self.info, text="3.3", relief=RIDGE)
+        version_val = Label(self.info, text="3.4", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -253,7 +281,7 @@ class Nse:
         if ask_quit:
             self.session.close()
             self.root.destroy()
-            quit()
+            sys.exit()
         elif not ask_quit:
             pass
 
@@ -274,6 +302,7 @@ class Nse:
         self.options = Menu(menubar, tearoff=0)
         self.options.add_command(label="Stop   (Ctrl+X)", command=self.change_state)
         self.options.add_command(label="Export to CSV   (Ctrl+S)", command=self.export)
+        self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
         self.options.add_separator()
         self.options.add_command(label="About   (Ctrl+M)", command=self.about)
         self.options.add_command(label="Quit   (Ctrl+Q)", command=self.close)
@@ -281,6 +310,7 @@ class Nse:
         self.root.config(menu=menubar)
 
         self.root.bind('<Control-s>', self.export)
+        self.root.bind('<Control-l>', self.log)
         self.root.bind('<Control-x>', self.change_state)
         self.root.bind('<Control-m>', self.about)
         self.root.bind('<Control-q>', self.close)
@@ -435,7 +465,7 @@ class Nse:
         else:
             self.pcr_val.config(text=self.put_call_ratio, bg=red)
 
-        def set_itm_labels(call_change, put_change):
+        def set_itm_labels(call_change: float, put_change: float) -> str:
             label = "No"
             if put_change > call_change:
                 if put_change >= 0:
