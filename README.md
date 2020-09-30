@@ -1,7 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![New-Site: v3.3](https://img.shields.io/badge/New--Site-v3.3-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.3)
+[![New-Site: v3.4](https://img.shields.io/badge/New--Site-v3.4-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.4)
 [![Old-Site: v2.0](https://img.shields.io/badge/Old--Site-v2.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 ![Build: passing](https://img.shields.io/badge/build-passing-brightgreen)
@@ -21,7 +21,7 @@ It also continuously refreshes the Option Chain and visually displays the trend 
  
  3. `.exe` (Windows Executable)
 
--Requirements for 3 (BETA):
+-Requirements for 3:
  
  - Windows OS  
 
@@ -38,14 +38,16 @@ It also continuously refreshes the Option Chain and visually displays the trend 
  - Required modules:
 
     ```
+    sys
+    datetime
+    webbrowser
+    json
+    csv
     tkinter
     tksheet
     pandas
-    datetime
-    webbrowser
-    csv
     requests
-    json
+    streamtologger
     ```
     
   - Install missing modules using `pip install module_name`
@@ -60,13 +62,19 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 
 ## Note:
 
--If there is an error in fetching dates then try refreshing  
+-If there is an error in fetching dates then try refreshing
+
+-In you face any issue then feel free to open an issue. 
+
+-It is recommended to enable logging and then send the nse.log file or the console output  
 
 -In case of network or connection errors the program doesn't crash and will keep retrying until manually stopped
 
 -If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
 -All data is retrieved from `https://www.nseindia.com/api/option-chain-indices?symbol=*index_name*`
+
+-[stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
 
 -[auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
 
@@ -94,6 +102,8 @@ It also continuously refreshes the Option Chain and visually displays the trend 
 -You can then paste it in any spreadsheet application (Tested with MS Excel and Google Sheets)
 
 -Export to .csv file option
+
+-Debug Logging toggle 
 
 -About window with version and links for developer GitHub profile, README, license, releases and sources
 
@@ -145,4 +155,4 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 -Option Menu
 
-![Screenshot_4](https://i.imgur.com/gGIQz9a.png)
+![Screenshot_4](https://i.imgur.com/wWTLWK6.png)
