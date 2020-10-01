@@ -12,7 +12,7 @@ The National Stock Exchange (NSE) has a website which displays the option chain 
 It also continuously refreshes the Option Chain and visually displays the trend in various indicators and useful for Technical Analysis.
 
 ## Installation:
-
+Easy Indtallation process
 -Types of variants available:
  
  1. `.py` (Python Source Code)
