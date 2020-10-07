@@ -34,54 +34,40 @@ class Nse:
         self.login_win(window)
 
     def get_data(self, event=None):
+        if self.first_run:
+            return self.get_data_first_run()
+        else:
+            return self.get_data_refresh()
+
+    def get_data_first_run(self):
         request = None
         response = None
-        if self.first_run:
-            self.index = self.index_var.get()
-            try:
-                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
-                self.cookies = dict(request.cookies)
-                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
-            except Exception as err:
-                print(request)
-                print(response)
-                print(err, "1")
-                messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
-                self.dates.clear()
-                self.dates = [""]
-                self.date_menu.config(values=tuple(self.dates))
-                self.date_menu.current(0)
-                return
-        else:
-            try:
-                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
-                if response.status_code == 401:
-                    self.session.close()
-                    self.session = requests.Session()
-                    url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
-                    request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
-                    self.cookies = dict(request.cookies)
-                    response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
-                    print("reset cookies")
-            except Exception as err:
-                print(request)
-                print(response)
-                print(err, "2")
-                return
-
+        self.index = self.index_var.get()
+        try:
+            url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
+            request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
+            self.cookies = dict(request.cookies)
+            response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+        except Exception as err:
+            print(request)
+            print(response)
+            print(err, "1")
+            messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
+            self.dates.clear()
+            self.dates = [""]
+            self.date_menu.config(values=tuple(self.dates))
+            self.date_menu.current(0)
+            return
         if response is not None:
             try:
                 json_data = response.json()
             except Exception as err:
                 print(response)
-                print(err, "3")
+                print(err, "2")
                 json_data = {}
         else:
             json_data = {}
-
-        if self.first_run and json_data == {}:
+        if json_data == {}:
             messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
             self.dates.clear()
             self.dates = [""]
@@ -89,20 +75,61 @@ class Nse:
                 self.date_menu.config(values=tuple(self.dates))
                 self.date_menu.current(0)
             except TclError as err:
-                print(err, "4")
+                print(err, "3")
             return
-        elif json_data == {}:
-            return
+        self.dates.clear()
+        for dates in json_data['records']['expiryDates']:
+            self.dates.append(dates)
+        try:
+            self.date_menu.config(values=tuple(self.dates))
+            self.date_menu.current(0)
+        except TclError as err:
+            print(err, "4")
 
-        if self.first_run:
-            self.dates.clear()
-            for dates in json_data['records']['expiryDates']:
-                self.dates.append(dates)
+        return response, json_data
+
+    def get_data_refresh(self):
+        request = None
+        response = None
+        try:
+            url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
+            response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+            if response.status_code == 401:
+                self.session.close()
+                self.session = requests.Session()
+                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
+                request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
+                self.cookies = dict(request.cookies)
+                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+                print("reset cookies")
+        except Exception as err:
+            print(request)
+            print(response)
+            print(err, "5")
             try:
-                self.date_menu.config(values=tuple(self.dates))
-                self.date_menu.current(0)
-            except TclError as err:
-                print(err, "5")
+                self.session.close()
+                self.session = requests.Session()
+                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
+                request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
+                self.cookies = dict(request.cookies)
+                response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
+                print("reset cookies")
+            except Exception as err:
+                print(request)
+                print(response)
+                print(err, "6")
+                return
+        if response is not None:
+            try:
+                json_data = response.json()
+            except Exception as err:
+                print(response)
+                print(err, "7")
+                json_data = {}
+        else:
+            json_data = {}
+        if json_data == {}:
+            return
 
         return response, json_data
 
@@ -165,7 +192,7 @@ class Nse:
             self.login.destroy()
             self.main_win()
         except ValueError as err:
-            print(err, "6")
+            print(err, "8")
             messagebox.showerror(title="Error", message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
 
     def change_state(self, event=None):
@@ -192,7 +219,7 @@ class Nse:
             messagebox.showinfo(title="Export Complete",
                                 message="Data has been exported to NSE-Option-Chain-Analyzer.csv.")
         except Exception as err:
-            print(err, "7")
+            print(err, "9")
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
@@ -253,7 +280,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val = Label(self.info, text="3.4", relief=RIDGE)
+        version_val = Label(self.info, text="3.5", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -636,7 +663,7 @@ class Nse:
         try:
             index = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
-            print(err, "8")
+            print(err, "10")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
