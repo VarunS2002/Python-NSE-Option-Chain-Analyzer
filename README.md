@@ -10,6 +10,7 @@
 For doing technical analysis for option traders, the Option Chain is the most important tool for deciding entry and exit strategies.
 The National Stock Exchange (NSE) has a website which displays the option chain for traders in near real-time. This program scrapes this data from the NSE site and then generates useful analysis of the Option Chain for the specified Security or Index from the NSE website.
 It also continuously refreshes the Option Chain and visually displays the trend in various indicators and useful for Technical Analysis.
+Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 ## Installation:
 
