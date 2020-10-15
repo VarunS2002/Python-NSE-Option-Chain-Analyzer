@@ -65,7 +65,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 -If there is an error in fetching dates then try refreshing
 
--In you face any issue then feel free to open an issue. 
+-If you face any issue then feel free to open an issue. 
 
 -It is recommended to enable logging and then send the nse.log file or the console output  
 
