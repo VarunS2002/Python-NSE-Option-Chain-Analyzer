@@ -51,7 +51,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
     streamtologger
     ```
     
-  - Install missing modules using `pip install module_name`
+  - Install missing modules using `pip install {module_name}`
 
 ## Usage:
 
@@ -73,11 +73,13 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 -If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
--All data is retrieved from `https://www.nseindia.com/api/option-chain-indices?symbol=*index_name*`
+-All data is retrieved from https://www.nseindia.com/api/option-chain-indices?symbol={index_name}
 
--[stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
+-[tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
 
 -[auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
+
+-[stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
 
 ## Features:
 
