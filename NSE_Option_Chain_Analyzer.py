@@ -353,7 +353,7 @@ class Nse:
         window_height: int = self.root.winfo_reqheight()
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
-        self.root.geometry("815x510+{}+{}".format(position_right, position_down))
+        self.root.geometry("815x560+{}+{}".format(position_right, position_down))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -396,6 +396,7 @@ class Nse:
         bottom_frame.rowconfigure(2, weight=1)
         bottom_frame.rowconfigure(3, weight=1)
         bottom_frame.rowconfigure(4, weight=1)
+        bottom_frame.rowconfigure(5, weight=1)
         bottom_frame.columnconfigure(0, weight=1)
         bottom_frame.columnconfigure(1, weight=1)
         bottom_frame.columnconfigure(2, weight=1)
@@ -409,7 +410,7 @@ class Nse:
         oi_ub_label: Label = Label(bottom_frame, text="Open Interest Upper Boundary", relief=RIDGE,
                                    font=("TkDefaultFont", 10, "bold"))
         oi_ub_label.grid(row=0, column=0, columnspan=4, sticky=N + S + W + E)
-        max_call_oi_sp_label: Label = Label(bottom_frame, text="Strike Price:", relief=RIDGE,
+        max_call_oi_sp_label: Label = Label(bottom_frame, text="Strike Price 1:", relief=RIDGE,
                                             font=("TkDefaultFont", 9, "bold"))
         max_call_oi_sp_label.grid(row=1, column=0, sticky=N + S + W + E)
         self.max_call_oi_sp_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -422,7 +423,7 @@ class Nse:
         oi_lb_label: Label = Label(bottom_frame, text="Open Interest Lower Boundary", relief=RIDGE,
                                    font=("TkDefaultFont", 10, "bold"))
         oi_lb_label.grid(row=0, column=4, columnspan=4, sticky=N + S + W + E)
-        max_put_oi_sp_label: Label = Label(bottom_frame, text="Strike Price:", relief=RIDGE,
+        max_put_oi_sp_label: Label = Label(bottom_frame, text="Strike Price 1:", relief=RIDGE,
                                            font=("TkDefaultFont", 9, "bold"))
         max_put_oi_sp_label.grid(row=1, column=4, sticky=N + S + W + E)
         self.max_put_oi_sp_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -432,32 +433,55 @@ class Nse:
         max_put_oi_label.grid(row=1, column=6, sticky=N + S + W + E)
         self.max_put_oi_val: Label = Label(bottom_frame, text="", relief=RIDGE)
         self.max_put_oi_val.grid(row=1, column=7, sticky=N + S + W + E)
+        max_call_oi_sp_2_label: Label = Label(bottom_frame, text="Strike Price 2:", relief=RIDGE,
+                                              font=("TkDefaultFont", 9, "bold"))
+        max_call_oi_sp_2_label.grid(row=2, column=0, sticky=N + S + W + E)
+        self.max_call_oi_sp_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
+        self.max_call_oi_sp_2_val.grid(row=2, column=1, sticky=N + S + W + E)
+        max_call_oi_2_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+                                           font=("TkDefaultFont", 9, "bold"))
+        max_call_oi_2_label.grid(row=2, column=2, sticky=N + S + W + E)
+        self.max_call_oi_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
+        self.max_call_oi_2_val.grid(row=2, column=3, sticky=N + S + W + E)
+        oi_lb_2_label: Label = Label(bottom_frame, text="Open Interest Lower Boundary", relief=RIDGE,
+                                     font=("TkDefaultFont", 10, "bold"))
+        oi_lb_2_label.grid(row=2, column=4, columnspan=4, sticky=N + S + W + E)
+        max_put_oi_sp_2_label: Label = Label(bottom_frame, text="Strike Price 2:", relief=RIDGE,
+                                             font=("TkDefaultFont", 9, "bold"))
+        max_put_oi_sp_2_label.grid(row=2, column=4, sticky=N + S + W + E)
+        self.max_put_oi_sp_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
+        self.max_put_oi_sp_2_val.grid(row=2, column=5, sticky=N + S + W + E)
+        max_put_oi_2_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+                                          font=("TkDefaultFont", 9, "bold"))
+        max_put_oi_2_label.grid(row=2, column=6, sticky=N + S + W + E)
+        self.max_put_oi_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
+        self.max_put_oi_2_val.grid(row=2, column=7, sticky=N + S + W + E)
 
         oi_label: Label = Label(bottom_frame, text="Open Interest:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
-        oi_label.grid(row=2, column=0, columnspan=2, sticky=N + S + W + E)
+        oi_label.grid(row=3, column=0, columnspan=2, sticky=N + S + W + E)
         self.oi_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.oi_val.grid(row=2, column=2, columnspan=2, sticky=N + S + W + E)
+        self.oi_val.grid(row=3, column=2, columnspan=2, sticky=N + S + W + E)
         pcr_label: Label = Label(bottom_frame, text="PCR:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
-        pcr_label.grid(row=2, column=4, columnspan=2, sticky=N + S + W + E)
+        pcr_label.grid(row=3, column=4, columnspan=2, sticky=N + S + W + E)
         self.pcr_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.pcr_val.grid(row=2, column=6, columnspan=2, sticky=N + S + W + E)
+        self.pcr_val.grid(row=3, column=6, columnspan=2, sticky=N + S + W + E)
         call_exits_label: Label = Label(bottom_frame, text="Call Exits:", relief=RIDGE,
                                         font=("TkDefaultFont", 9, "bold"))
-        call_exits_label.grid(row=3, column=0, columnspan=2, sticky=N + S + W + E)
+        call_exits_label.grid(row=4, column=0, columnspan=2, sticky=N + S + W + E)
         self.call_exits_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.call_exits_val.grid(row=3, column=2, columnspan=2, sticky=N + S + W + E)
+        self.call_exits_val.grid(row=4, column=2, columnspan=2, sticky=N + S + W + E)
         put_exits_label: Label = Label(bottom_frame, text="Put Exits:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
-        put_exits_label.grid(row=3, column=4, columnspan=2, sticky=N + S + W + E)
+        put_exits_label.grid(row=4, column=4, columnspan=2, sticky=N + S + W + E)
         self.put_exits_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.put_exits_val.grid(row=3, column=6, columnspan=2, sticky=N + S + W + E)
+        self.put_exits_val.grid(row=4, column=6, columnspan=2, sticky=N + S + W + E)
         call_itm_label: Label = Label(bottom_frame, text="Call ITM:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
-        call_itm_label.grid(row=4, column=0, columnspan=2, sticky=N + S + W + E)
+        call_itm_label.grid(row=5, column=0, columnspan=2, sticky=N + S + W + E)
         self.call_itm_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.call_itm_val.grid(row=4, column=2, columnspan=2, sticky=N + S + W + E)
+        self.call_itm_val.grid(row=5, column=2, columnspan=2, sticky=N + S + W + E)
         put_itm_label: Label = Label(bottom_frame, text="Put ITM:", relief=RIDGE, font=("TkDefaultFont", 9, "bold"))
-        put_itm_label.grid(row=4, column=4, columnspan=2, sticky=N + S + W + E)
+        put_itm_label.grid(row=5, column=4, columnspan=2, sticky=N + S + W + E)
         self.put_itm_val: Label = Label(bottom_frame, text="", relief=RIDGE)
-        self.put_itm_val.grid(row=4, column=6, columnspan=2, sticky=N + S + W + E)
+        self.put_itm_val.grid(row=5, column=6, columnspan=2, sticky=N + S + W + E)
 
         self.root.after(100, self.main)
 
@@ -517,8 +541,12 @@ class Nse:
 
         self.max_call_oi_val.config(text=self.max_call_oi)
         self.max_call_oi_sp_val.config(text=self.max_call_oi_sp)
+        self.max_call_oi_2_val.config(text=self.max_call_oi_2)
+        self.max_call_oi_sp_2_val.config(text=self.max_call_oi_sp_2)
         self.max_put_oi_val.config(text=self.max_put_oi)
         self.max_put_oi_sp_val.config(text=self.max_put_oi_sp)
+        self.max_put_oi_2_val.config(text=self.max_put_oi_2)
+        self.max_put_oi_sp_2_val.config(text=self.max_put_oi_sp_2)
 
         red: str = "#e53935"
         green: str = "#00e676"
@@ -695,15 +723,21 @@ class Nse:
         for i in range(len(df)):
             int_call_oi: int = int(df.iloc[i, [0]][0])
             call_oi_list.append(int_call_oi)
-        call_oi_index: int = call_oi_list.index(max(call_oi_list))
-        self.max_call_oi: float = round(max(call_oi_list) / 1000, 1)
+        call_oi_list_sorted: List[int] = sorted(call_oi_list)
+        call_oi_index: int = call_oi_list.index(call_oi_list_sorted[-1])
+        call_oi_index_2: int = call_oi_list.index(call_oi_list_sorted[-2])
+        self.max_call_oi: float = round(call_oi_list_sorted[-1] / 1000, 1)
+        self.max_call_oi_2: float = round(call_oi_list_sorted[-2] / 1000, 1)
 
         put_oi_list: List[int] = []
         for i in range(len(df)):
             int_put_oi: int = int(df.iloc[i, [20]][0])
             put_oi_list.append(int_put_oi)
-        put_oi_index: int = put_oi_list.index(max(put_oi_list))
-        self.max_put_oi: float = round(max(put_oi_list) / 1000, 1)
+        put_oi_list_sorted: List[int] = sorted(put_oi_list)
+        put_oi_index: int = put_oi_list.index(put_oi_list_sorted[-1])
+        put_oi_index_2: int = put_oi_list.index(put_oi_list_sorted[-2])
+        self.max_put_oi: float = round(put_oi_list_sorted[-1] / 1000, 1)
+        self.max_put_oi_2: float = round(put_oi_list_sorted[-2] / 1000, 1)
 
         total_call_oi: int = sum(call_oi_list)
         total_put_oi: int = sum(put_oi_list)
@@ -714,7 +748,9 @@ class Nse:
             self.put_call_ratio = 0
 
         self.max_call_oi_sp: numpy.float64 = df.iloc[call_oi_index]['Strike Price']
+        self.max_call_oi_sp_2: numpy.float64 = df.iloc[call_oi_index_2]['Strike Price']
         self.max_put_oi_sp: numpy.float64 = df.iloc[put_oi_index]['Strike Price']
+        self.max_put_oi_sp_2: numpy.float64 = df.iloc[put_oi_index_2]['Strike Price']
 
         try:
             index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
