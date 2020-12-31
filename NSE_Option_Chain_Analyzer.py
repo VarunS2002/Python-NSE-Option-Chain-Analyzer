@@ -723,21 +723,52 @@ class Nse:
         for i in range(len(df)):
             int_call_oi: int = int(df.iloc[i, [0]][0])
             call_oi_list.append(int_call_oi)
-        call_oi_list_sorted: List[int] = sorted(call_oi_list)
-        call_oi_index: int = call_oi_list.index(call_oi_list_sorted[-1])
-        call_oi_index_2: int = call_oi_list.index(call_oi_list_sorted[-2])
-        self.max_call_oi: float = round(call_oi_list_sorted[-1] / 1000, 1)
-        self.max_call_oi_2: float = round(call_oi_list_sorted[-2] / 1000, 1)
+        call_oi_index: int = call_oi_list.index(max(call_oi_list))
+        self.max_call_oi: float = round(max(call_oi_list) / 1000, 1)
+        self.max_call_oi_sp: numpy.float64 = df.iloc[call_oi_index]['Strike Price']
 
         put_oi_list: List[int] = []
         for i in range(len(df)):
             int_put_oi: int = int(df.iloc[i, [20]][0])
             put_oi_list.append(int_put_oi)
-        put_oi_list_sorted: List[int] = sorted(put_oi_list)
-        put_oi_index: int = put_oi_list.index(put_oi_list_sorted[-1])
-        put_oi_index_2: int = put_oi_list.index(put_oi_list_sorted[-2])
-        self.max_put_oi: float = round(put_oi_list_sorted[-1] / 1000, 1)
-        self.max_put_oi_2: float = round(put_oi_list_sorted[-2] / 1000, 1)
+        put_oi_index: int = put_oi_list.index(max(put_oi_list))
+        self.max_put_oi: float = round(max(put_oi_list) / 1000, 1)
+        self.max_put_oi_sp: numpy.float64 = df.iloc[put_oi_index]['Strike Price']
+
+        sp_range_list: List[numpy.float64] = []
+        for i in range(put_oi_index, call_oi_index + 1):
+            sp_range_list.append(df.iloc[i]['Strike Price'])
+
+        self.max_call_oi_2: float
+        self.max_call_oi_sp_2: numpy.float64
+        self.max_put_oi_2: float
+        self.max_put_oi_sp_2: numpy.float64
+        if self.max_call_oi_sp == self.max_put_oi_sp:
+            self.max_call_oi_2 = self.max_call_oi
+            self.max_call_oi_sp_2 = self.max_call_oi_sp
+            self.max_put_oi_2 = self.max_put_oi
+            self.max_put_oi_sp_2 = self.max_put_oi_sp
+        elif len(sp_range_list) == 2:
+            self.max_call_oi_2 = df[df['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]
+            self.max_call_oi_sp_2 = self.max_put_oi_sp
+            self.max_put_oi_2 = df[df['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]
+            self.max_put_oi_sp_2 = self.max_call_oi_sp
+        else:
+            call_oi_list_2: List[int] = []
+            for i in range(put_oi_index, call_oi_index):
+                int_call_oi_2: int = int(df.iloc[i, [0]][0])
+                call_oi_list_2.append(int_call_oi_2)
+            call_oi_index_2: int = put_oi_index + call_oi_list_2.index(max(call_oi_list_2))
+            self.max_call_oi_2 = round(max(call_oi_list_2) / 1000, 1)
+            self.max_call_oi_sp_2 = df.iloc[call_oi_index_2]['Strike Price']
+
+            put_oi_list_2: List[int] = []
+            for i in range(put_oi_index + 1, call_oi_index + 1):
+                int_put_oi_2: int = int(df.iloc[i, [20]][0])
+                put_oi_list_2.append(int_put_oi_2)
+            put_oi_index_2: int = put_oi_index + 1 + put_oi_list_2.index(max(put_oi_list_2))
+            self.max_put_oi_2 = round(max(put_oi_list_2) / 1000, 1)
+            self.max_put_oi_sp_2 = df.iloc[put_oi_index_2]['Strike Price']
 
         total_call_oi: int = sum(call_oi_list)
         total_put_oi: int = sum(put_oi_list)
@@ -746,11 +777,6 @@ class Nse:
             self.put_call_ratio = round(total_put_oi / total_call_oi, 2)
         except ZeroDivisionError:
             self.put_call_ratio = 0
-
-        self.max_call_oi_sp: numpy.float64 = df.iloc[call_oi_index]['Strike Price']
-        self.max_call_oi_sp_2: numpy.float64 = df.iloc[call_oi_index_2]['Strike Price']
-        self.max_put_oi_sp: numpy.float64 = df.iloc[put_oi_index]['Strike Price']
-        self.max_put_oi_sp_2: numpy.float64 = df.iloc[put_oi_index_2]['Strike Price']
 
         try:
             index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
