@@ -1,13 +1,16 @@
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
-from tkinter import *
+import sys
+import os
+import datetime
+import webbrowser
+import csv
+from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
+    Label, Button, Entry, SOLID, RIDGE, N, S, E, W, LEFT
 from tkinter.ttk import Combobox
 from tkinter import messagebox
 import tksheet
 import numpy
 import pandas
-import datetime
-import webbrowser
-import csv
 import requests
 import sys
 import streamtologger
@@ -237,7 +240,13 @@ class Nse:
     # noinspection PyUnusedLocal
     def export(self, event: Optional[Event] = None) -> None:
         sheet_data: List[List[str]] = self.sheet.get_sheet_data()
-
+        csv_exists = os.path.isfile("NSE-Option-Chain-Analyzer.csv")
+        if not csv_exists:
+            with open("NSE-Option-Chain-Analyzer.csv", "a", newline="") as row:
+                data_writer: csv.writer = csv.writer(row)
+                data_writer.writerow((
+                    'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
+                    'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
         try:
             with open("NSE-Option-Chain-Analyzer.csv", "a", newline="") as row:
                 data_writer: csv.writer = csv.writer(row)
