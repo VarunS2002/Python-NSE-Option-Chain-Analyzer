@@ -226,11 +226,11 @@ class Nse:
         if not self.stop:
             self.stop = True
             self.options.entryconfig(self.options.index(0), label="Start   (Ctrl+X)")
-            messagebox.showinfo(title="Stopped", message="Scraping new data has been stopped.")
+            messagebox.showinfo(title="Stopped", message="Retrieving new data has been stopped.")
         else:
             self.stop = False
             self.options.entryconfig(self.options.index(0), label="Stop   (Ctrl+X)")
-            messagebox.showinfo(title="Started", message="Scraping new data has been started.")
+            messagebox.showinfo(title="Started", message="Retrieving new data has been started.")
 
             self.main()
 
@@ -256,14 +256,16 @@ class Nse:
             streamtologger.redirect(target="nse.log", header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
             self.options.entryconfig(self.options.index(2), label="Logging: On   (Ctrl+L)")
-            messagebox.showinfo(title="Started", message="Debug Logging has been enabled.")
+            if event is not None:
+                messagebox.showinfo(title="Debug Logging Enabled", message="Debug Logging has been enabled.")
         elif self.logging:
             sys.stdout = self.stdout
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
             self.options.entryconfig(self.options.index(2), label="Logging: Off   (Ctrl+L)")
-            messagebox.showinfo(title="Stopped", message="Debug Logging has been disabled.")
+            if event is not None:
+                messagebox.showinfo(title="Debug Logging Disabled", message="Debug Logging has been disabled.")
 
     # noinspection PyUnusedLocal
     def links(self, link: str, event: Optional[Event] = None) -> None:
