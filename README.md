@@ -1,7 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![New-Site: v3.5](https://img.shields.io/badge/New--Site-v3.5-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.5)
+[![New-Site: v3.7](https://img.shields.io/badge/New--Site-v3.7-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.7)
 [![Old-Site: v2.0](https://img.shields.io/badge/Old--Site-v2.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -35,22 +35,9 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
  
  - To run the Compiled Python file with Console change the extension to `.pyc` 
 
- - Required modules:
-
-    ```
-    sys
-    datetime
-    webbrowser
-    json
-    csv
-    tkinter
-    tksheet
-    pandas
-    requests
-    streamtologger
-    ```
-    
-  - Install missing modules using `pip install {module_name}`
+ - Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
+   
+ - Install missing modules using `pip install -r requirements.txt`
 
 ## Usage:
 
@@ -58,15 +45,17 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 2. Enter your preferred Strike Price 
 
-3. Click Start
+3. Enter the interval you want the program to refresh (Optional : Defaults to 1 minute)
+
+4. Click Start
 
 ## Note:
 
 -If there is an error in fetching dates then try refreshing
 
--If you face any issue then feel free to open an issue. 
+-If you face any issue or have a suggestion then feel free to open an issue. 
 
--It is recommended to enable logging and then send the nse.log file or the console output  
+-It is recommended to enable logging and then send the nse.log file or the console output for reporting issues  
 
 -In case of network or connection errors the program doesn't crash and will keep retrying until manually stopped
 
@@ -82,7 +71,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 ## Features:
 
--The program continuously retrieves and refreshes the option chain every minute giving near real-time analysis to the traders
+-The program continuously retrieves and refreshes the option chain giving near real-time analysis to the traders
 
 -New data row is added only if the NSE server updates its time or data (To prevent printing duplicate data)
 
@@ -115,7 +104,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 -Table Data displayed:
 
-Data | How it's calculated
+Data | Description
 --- | ---
 Server Time | *Web Scraped*. Indicates last data update time by NSE server 
 Value | *Web Scraped*. Underlying Instrument Value indicates the value of the underlying Security or Index
@@ -129,12 +118,12 @@ Put In The Money(ITM) | This indicates that bearish trend could continue and Val
 
 -Label Data displayed:
 
-Data | How it's calculated
+Data | Description
 --- | ---
-Max Call Open Interest and Strike Price | Highest Call Open Interest contracts (in thousands) and it's corresponding Strike Price
-Max Put Open Interest and Strike Price | Highest Put Open Interest contracts (in thousands) and it's corresponding Strike Price
-Put Call Ratio(PCR) | Sum Total of Put Open Interest contracts divided by Sum Total of Call Open Interest contracts
+Open Interest Upper Boundary | Highest and 2nd Highest(highest in OI boundary range) Call Open Interest contracts (in thousands) and their corresponding Strike Prices
+Open Interest Lower Boundary | Highest and 2nd Highest(highest in OI boundary range) Put Open Interest contracts (in thousands) and their corresponding Strike Prices
 Open Interest | This indicates if the latest OI data record indicates Bearish or Bullish signs near Indicated Strike Price. If the Call Sum is more than the Put Sum then the OI is considered Bearish as there is more Call writing than Puts. If the Put Sum is more than the Call sum then the OI Is considered Bullish as the Put writing exceeds the Call writing.
+Put Call Ratio(PCR) | Sum Total of Put Open Interest contracts divided by Sum Total of Call Open Interest contracts
 Call Exits | This indicates if the Call writers are exiting near given Strike Price in the latest OI data record. If the Call sum is < 0 or if the change in Call OI at the Call boundary (2 Strike Prices above the given Strike Price) is < 0, then Call writers are exiting their positions and the Bulls have a clear path.
 Put Exits | This indicates if the Put writers are exiting near given Strike Price in the latest OI data record. If the Put sum is < 0 or if the change in Put OI at the Put boundary (the given Strike Price) is < 0, then Put writers are exiting their positions and the Bears have a clear path.
 Call In The Money(ITM) | This indicates if the Call writers are also exiting far OTM strike prices (4 Strike Prices above the given Strike Price) showing extreme bullishness. Conditions are if the Call writers are exiting their far OTM positions and the Put writers are writing at the same Strike Price & if the absolute ratio > 1.5 then its bullish sign. This signal also changes to Yes if the change in Call OI at the far OTM is < 0.
@@ -145,16 +134,16 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 -Login Page:
 
-![Screenshot_1](https://i.imgur.com/2heigvk.png)
+![Login_Window](https://i.imgur.com/fxgKDBS.png)
 
 -Main Window:
 
-![Screenshot_2](https://i.imgur.com/2JO5BuT.png)
+![Main_Window](https://i.imgur.com/iGpVH0X.png)
 
--Selecting data:
+-Selecting Data:
 
-![Screenshot_3](https://i.imgur.com/wxoEyPZ.png)
+![Selecting_Data](https://i.imgur.com/3J9NMVm.png)
 
 -Option Menu
 
-![Screenshot_4](https://i.imgur.com/wWTLWK6.png)
+![Option_Menu](https://i.imgur.com/B95NciH.png)

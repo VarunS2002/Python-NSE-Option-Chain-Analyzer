@@ -311,7 +311,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label: Label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val: Label = Label(self.info, text="3.5", relief=RIDGE)
+        version_val: Label = Label(self.info, text="3.7", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label: Label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
