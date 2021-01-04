@@ -15,25 +15,21 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 -Types of variants available:
  
- 1. `.py` (Python Source Code)
- 
- 2. `.pyw` (Compiled Python file without Console)
- 
- 3. `.exe` (Windows Executable)
+ 1. `.exe` (Windows Executable)
 
--Requirements for 3:
+ 2. `.py` (Python Source Code)
+
+-Requirements for 1:
  
  - Windows OS  
 
--Requirements for 1 and 2:
+-Requirements for 2:
  
  - Python 3.6+ 
  
  - For Windows https://www.python.org/downloads/ is recommended
 
  - Add Python to PATH/Environment Variables during installation in Windows (recommended)
- 
- - To run the Compiled Python file with Console change the extension to `.pyc` 
 
  - Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
    
