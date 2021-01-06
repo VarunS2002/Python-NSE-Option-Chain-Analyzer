@@ -5,9 +5,8 @@ import datetime
 import webbrowser
 import csv
 from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
-    Label, Button, Entry, SOLID, RIDGE, N, S, E, W, LEFT
-from tkinter.ttk import Combobox
-from tkinter import messagebox
+    Label, Entry, SOLID, RIDGE, N, S, E, W, LEFT, messagebox
+from tkinter.ttk import Combobox, Button
 import tksheet
 import numpy
 import pandas
