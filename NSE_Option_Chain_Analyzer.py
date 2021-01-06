@@ -26,6 +26,8 @@ class Nse:
         self.previous_time: Optional[datetime.time] = None
         self.first_run: bool = True
         self.stop: bool = False
+        self.notifications: bool = False
+        self.auto_stop: bool = False
         self.logging: bool = False
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
@@ -37,8 +39,7 @@ class Nse:
         self.url_oc: str = "https://www.nseindia.com/option-chain"
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
-        self.notifications: bool = False
-        self.toaster = win10toast.ToastNotifier()
+        self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier()
         self.icon_path: str = Nse.get_icon_path() if os.path.isfile(Nse.get_icon_path()) else ''
         self.login_win(window)
 
@@ -285,11 +286,19 @@ class Nse:
             if event is not None:
                 messagebox.showinfo(title="Notifications Enabled", message="Toast Notifications have been enabled.")
 
+    def toggle_auto_stop(self) -> None:
+        if self.auto_stop:
+            self.auto_stop = False
+            messagebox.showinfo(title="Auto Stop Disabled", message="Program will not automatically stop at 3:30pm")
+        else:
+            self.auto_stop = True
+            messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
+
     def log(self, event: Optional[Event] = None) -> None:
         if not self.logging:
             streamtologger.redirect(target="nse.log", header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
-            self.options.entryconfig(self.options.index(3), label="Logging: On   (Ctrl+L)")
+            self.options.entryconfig(self.options.index(5), label="Logging: On   (Ctrl+L)")
             if event is not None:
                 messagebox.showinfo(title="Debug Logging Enabled", message="Debug Logging has been enabled.")
         elif self.logging:
@@ -297,7 +306,7 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(3), label="Logging: Off   (Ctrl+L)")
+            self.options.entryconfig(self.options.index(5), label="Logging: Off   (Ctrl+L)")
             if event is not None:
                 messagebox.showinfo(title="Debug Logging Disabled", message="Debug Logging has been disabled.")
 
@@ -402,6 +411,8 @@ class Nse:
         self.options.add_command(label="Stop   (Ctrl+X)", command=self.change_state)
         self.options.add_command(label="Notifications: Off   (Ctrl+N)", command=self.toggle_notifications)
         self.options.add_command(label="Export to CSV   (Ctrl+S)", command=self.export)
+        self.options.add_checkbutton(label="Stop automatically at 3:30pm", onvalue=1, offvalue=0,
+                                     command=self.toggle_auto_stop)
         self.options.add_separator()
         self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
         self.options.add_command(label="About   (Ctrl+M)", command=self.about)
@@ -960,6 +971,11 @@ class Nse:
 
         if self.first_run:
             self.first_run = False
+        if self.str_current_time == '15:30:00' and not self.stop and self.auto_stop:
+            self.stop = True
+            self.options.entryconfig(self.options.index(0), label="Start   (Ctrl+X)")
+            messagebox.showinfo(title="Market Closed", message="Retrieving new data has been stopped.")
+            return
         self.root.after((self.seconds * 1000), self.main)
         return
 
