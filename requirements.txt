@@ -1,5 +1,6 @@
+tksheet>=4.9.96
 numpy==1.19.3
 pandas>=1.1.4
 requests>=2.24.0
+win10toast>=0.9
 streamtologger>=2017.1
-tksheet>=4.9.96

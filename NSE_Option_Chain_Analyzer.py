@@ -12,6 +12,7 @@ import tksheet
 import numpy
 import pandas
 import requests
+import win10toast
 import streamtologger
 
 
@@ -37,7 +38,20 @@ class Nse:
         self.url_oc: str = "https://www.nseindia.com/option-chain"
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
+        self.notifications: bool = False
+        self.toaster = win10toast.ToastNotifier()
+        self.icon_path: str = Nse.get_icon_path() if os.path.isfile(Nse.get_icon_path()) else ''
         self.login_win(window)
+
+    @staticmethod
+    def get_icon_path() -> str:
+        # noinspection PyBroadException
+        try:
+            # noinspection PyProtectedMember,PyUnresolvedReferences
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, 'nse_logo.ico')
 
     # noinspection PyUnusedLocal
     def get_data(self, event: Optional[Event] = None) -> Optional[Tuple[Optional[requests.Response], Any]]:
@@ -149,6 +163,8 @@ class Nse:
         position_right: int = int(self.login.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
         self.login.geometry("320x110+{}+{}".format(position_right, position_down))
+        if self.icon_path:
+            self.login.iconbitmap(self.icon_path)
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -258,12 +274,23 @@ class Nse:
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
-    # noinspection PyUnusedLocal
+    def toggle_notifications(self, event: Optional[Event] = None) -> None:
+        if self.notifications:
+            self.notifications = False
+            self.options.entryconfig(self.options.index(1), label="Notifications: Off   (Ctrl+N)")
+            if event is not None:
+                messagebox.showinfo(title="Notifications Disabled", message="Toast Notifications have been disabled.")
+        else:
+            self.notifications = True
+            self.options.entryconfig(self.options.index(1), label="Notifications: On   (Ctrl+N)")
+            if event is not None:
+                messagebox.showinfo(title="Notifications Enabled", message="Toast Notifications have been enabled.")
+
     def log(self, event: Optional[Event] = None) -> None:
         if not self.logging:
             streamtologger.redirect(target="nse.log", header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
-            self.options.entryconfig(self.options.index(2), label="Logging: On   (Ctrl+L)")
+            self.options.entryconfig(self.options.index(3), label="Logging: On   (Ctrl+L)")
             if event is not None:
                 messagebox.showinfo(title="Debug Logging Enabled", message="Debug Logging has been enabled.")
         elif self.logging:
@@ -271,7 +298,7 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(2), label="Logging: Off   (Ctrl+L)")
+            self.options.entryconfig(self.options.index(3), label="Logging: Off   (Ctrl+L)")
             if event is not None:
                 messagebox.showinfo(title="Debug Logging Disabled", message="Debug Logging has been disabled.")
 
@@ -299,6 +326,8 @@ class Nse:
         position_right: int = int(self.info.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
+        if self.icon_path:
+            self.info.iconbitmap(self.icon_path)
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -364,21 +393,25 @@ class Nse:
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
+        if self.icon_path:
+            self.root.iconbitmap(self.icon_path)
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
         menubar: Menu = Menu(self.root)
         self.options: Menu = Menu(menubar, tearoff=0)
         self.options.add_command(label="Stop   (Ctrl+X)", command=self.change_state)
+        self.options.add_command(label="Notifications: Off   (Ctrl+N)", command=self.toggle_notifications)
         self.options.add_command(label="Export to CSV   (Ctrl+S)", command=self.export)
-        self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
         self.options.add_separator()
+        self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
         self.options.add_command(label="About   (Ctrl+M)", command=self.about)
         self.options.add_command(label="Quit   (Ctrl+Q)", command=self.close)
         menubar.add_cascade(label="Menu", menu=self.options)
         self.root.config(menu=menubar)
 
         self.root.bind('<Control-s>', self.export)
+        self.root.bind('<Control-n>', self.toggle_notifications)
         self.root.bind('<Control-l>', self.log)
         self.root.bind('<Control-x>', self.change_state)
         self.root.bind('<Control-m>', self.about)
@@ -562,10 +595,27 @@ class Nse:
         green: str = "#00e676"
         default: str = "SystemButtonFace"
 
+        bg: str
+
+        self.old_oi_label: str
+        oi_label: str
+
         if self.call_sum >= self.put_sum:
-            self.oi_val.config(text="Bearish", bg=red)
+            oi_label = "Bearish"
+            bg = red
         else:
-            self.oi_val.config(text="Bullish", bg=green)
+            oi_label = "Bullish"
+            bg = green
+        self.oi_val.config(text=oi_label, bg=bg)
+
+        if self.first_run or self.old_oi_label == oi_label:
+            self.old_oi_label = oi_label
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Open Interest changed", f"Changed from {self.old_oi_label} to {oi_label}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_oi_label = oi_label
+
         if self.put_call_ratio >= 1:
             self.pcr_val.config(text=self.put_call_ratio, bg=green)
         else:
@@ -586,6 +636,7 @@ class Nse:
                 label = "Yes"
             return label
 
+        self.old_call_label: str
         call: str = set_itm_labels(call_change=self.p5, put_change=self.p4)
 
         if call == "No":
@@ -593,6 +644,15 @@ class Nse:
         else:
             self.call_itm_val.config(text="Yes", bg=green)
 
+        if self.first_run or self.old_call_label == call:
+            self.old_call_label = call
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Call ITM changed", f"Changed from {self.old_call_label} to {call}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_call_label = call
+
+        self.old_put_label: str
         put: str = set_itm_labels(call_change=self.p7, put_change=self.p6)
 
         if put == "No":
@@ -600,18 +660,59 @@ class Nse:
         else:
             self.put_itm_val.config(text="Yes", bg=red)
 
+        if self.first_run or self.old_put_label == put:
+            self.old_put_label = put
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Put ITM changed", f"Changed from {self.old_put_label} to {put}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_put_label = put
+
+        self.old_call_exits_label: str
+        call_exits_label: str
+
         if self.call_boundary <= 0:
-            self.call_exits_val.config(text="Yes", bg=green)
+            call_exits_label = "Yes"
+            bg = green
         elif self.call_sum <= 0:
-            self.call_exits_val.config(text="Yes", bg=green)
+            call_exits_label = "Yes"
+            bg = green
         else:
-            self.call_exits_val.config(text="No", bg=default)
+            call_exits_label = "No"
+            bg = default
+
+        self.call_exits_val.config(text=call_exits_label, bg=bg)
+        if self.first_run or self.old_call_exits_label == call_exits_label:
+            self.old_call_exits_label = call_exits_label
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Call Exits changed",
+                                        f"Changed from {self.old_call_exits_label} to {call_exits_label}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_call_exits_label = call_exits_label
+
+        self.old_put_exits_label: str
+        put_exits_label: str
+
         if self.put_boundary <= 0:
-            self.put_exits_val.config(text="Yes", bg=red)
+            put_exits_label = "Yes"
+            bg = red
         elif self.put_sum <= 0:
-            self.put_exits_val.config(text="Yes", bg=red)
+            put_exits_label = "Yes"
+            bg = red
         else:
-            self.put_exits_val.config(text="No", bg=default)
+            put_exits_label = "No"
+            bg = default
+
+        self.put_exits_val.config(text=put_exits_label, bg=bg)
+        if self.first_run or self.old_put_exits_label == put_exits_label:
+            self.old_put_exits_label = put_exits_label
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Put Exits changed",
+                                        f"Changed from {self.old_put_exits_label} to {put_exits_label}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_put_exits_label = put_exits_label
 
         output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
                                                                  self.put_sum, self.difference,
