@@ -44,11 +44,11 @@ class Nse:
 
     @staticmethod
     def get_icon_path() -> str:
-        # noinspection PyBroadException
         try:
             # noinspection PyProtectedMember,PyUnresolvedReferences
             base_path = sys._MEIPASS
-        except Exception:
+        except AttributeError as err:
+            print(err, "0")
             base_path = os.path.abspath(".")
         return os.path.join(base_path, 'nse_logo.ico')
 
