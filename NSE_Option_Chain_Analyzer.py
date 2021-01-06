@@ -12,7 +12,6 @@ import tksheet
 import numpy
 import pandas
 import requests
-import sys
 import streamtologger
 
 
