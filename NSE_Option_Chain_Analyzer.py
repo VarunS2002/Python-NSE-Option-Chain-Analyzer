@@ -267,48 +267,54 @@ class Nse:
                 data_writer: csv.writer = csv.writer(row)
                 data_writer.writerows(sheet_data)
 
-            messagebox.showinfo(title="Export Complete",
+            messagebox.showinfo(title="Export Successful",
                                 message="Data has been exported to NSE-Option-Chain-Analyzer.csv.")
         except Exception as err:
             print(err, "9")
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
+    # noinspection PyUnusedLocal
     def toggle_notifications(self, event: Optional[Event] = None) -> None:
         if self.notifications:
             self.notifications = False
-            self.options.entryconfig(self.options.index(1), label="Notifications: Off   (Ctrl+N)")
-            if event is not None:
-                messagebox.showinfo(title="Notifications Disabled", message="Toast Notifications have been disabled.")
+            self.options.entryconfig(self.options.index(2), label="Notifications: Off   (Ctrl+N)")
+            messagebox.showinfo(title="Notifications Disabled",
+                                message="You will not receive any Notifications.")
         else:
             self.notifications = True
-            self.options.entryconfig(self.options.index(1), label="Notifications: On   (Ctrl+N)")
-            if event is not None:
-                messagebox.showinfo(title="Notifications Enabled", message="Toast Notifications have been enabled.")
+            self.options.entryconfig(self.options.index(2), label="Notifications: On   (Ctrl+N)")
+            messagebox.showinfo(title="Notifications Enabled",
+                                message="You will receive Notifications when the state of a label changes.")
 
-    def toggle_auto_stop(self) -> None:
+    def toggle_auto_stop(self, event: Optional[Event] = None) -> None:
         if self.auto_stop:
             self.auto_stop = False
             messagebox.showinfo(title="Auto Stop Disabled", message="Program will not automatically stop at 3:30pm")
+            if event is not None:
+                self.options.entryconfig(self.options.index(3), onvalue=1, offvalue=0)
         else:
             self.auto_stop = True
             messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
+            if event is not None:
+                self.options.entryconfig(self.options.index(3), onvalue=0, offvalue=1)
 
+    # noinspection PyUnusedLocal
     def log(self, event: Optional[Event] = None) -> None:
         if not self.logging:
-            streamtologger.redirect(target="nse.log", header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
+            streamtologger.redirect(target="NSE-Option-Chain-Analyzer.log",
+                                    header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
             self.options.entryconfig(self.options.index(5), label="Logging: On   (Ctrl+L)")
-            if event is not None:
-                messagebox.showinfo(title="Debug Logging Enabled", message="Debug Logging has been enabled.")
+            messagebox.showinfo(title="Debug Logging Enabled",
+                                message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
         elif self.logging:
             sys.stdout = self.stdout
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
             self.options.entryconfig(self.options.index(5), label="Logging: Off   (Ctrl+L)")
-            if event is not None:
-                messagebox.showinfo(title="Debug Logging Disabled", message="Debug Logging has been disabled.")
+            messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
     # noinspection PyUnusedLocal
     def links(self, link: str, event: Optional[Event] = None) -> None:
@@ -342,8 +348,7 @@ class Nse:
 
         return self.info
 
-    # noinspection PyUnusedLocal
-    def about(self, event: Optional[Event] = None) -> None:
+    def about(self) -> None:
         self.info: Toplevel = self.about_window()
         self.info.rowconfigure(0, weight=1)
         self.info.rowconfigure(1, weight=1)
@@ -409,22 +414,22 @@ class Nse:
         menubar: Menu = Menu(self.root)
         self.options: Menu = Menu(menubar, tearoff=0)
         self.options.add_command(label="Stop   (Ctrl+X)", command=self.change_state)
-        self.options.add_command(label="Notifications: Off   (Ctrl+N)", command=self.toggle_notifications)
         self.options.add_command(label="Export to CSV   (Ctrl+S)", command=self.export)
-        self.options.add_checkbutton(label="Stop automatically at 3:30pm", onvalue=1, offvalue=0,
+        self.options.add_command(label="Notifications: Off   (Ctrl+N)", command=self.toggle_notifications)
+        self.options.add_checkbutton(label="Stop automatically at 3:30pm   (Ctrl+K)", onvalue=1, offvalue=0,
                                      command=self.toggle_auto_stop)
         self.options.add_separator()
         self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
-        self.options.add_command(label="About   (Ctrl+M)", command=self.about)
+        self.options.add_command(label="About", command=self.about)
         self.options.add_command(label="Quit   (Ctrl+Q)", command=self.close)
         menubar.add_cascade(label="Menu", menu=self.options)
         self.root.config(menu=menubar)
 
+        self.root.bind('<Control-x>', self.change_state)
         self.root.bind('<Control-s>', self.export)
         self.root.bind('<Control-n>', self.toggle_notifications)
+        self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-l>', self.log)
-        self.root.bind('<Control-x>', self.change_state)
-        self.root.bind('<Control-m>', self.about)
         self.root.bind('<Control-q>', self.close)
 
         top_frame: Frame = Frame(self.root)
