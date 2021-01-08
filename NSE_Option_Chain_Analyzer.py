@@ -335,7 +335,7 @@ class Nse:
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
             except AttributeError as err:
-                print(err)  # TODO: Number all errors
+                print(err, "10")
         elif self.logging:
             sys.stdout = self.stdout
             sys.stderr = self.stderr
@@ -944,7 +944,7 @@ class Nse:
         try:
             index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
-            print(err, "10")
+            print(err, "11")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
