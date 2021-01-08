@@ -4,6 +4,7 @@ import os
 import datetime
 import webbrowser
 import csv
+import configparser
 from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
     Label, Entry, SOLID, RIDGE, N, S, E, W, LEFT, messagebox
 from tkinter.ttk import Combobox, Button
@@ -26,9 +27,22 @@ class Nse:
         self.previous_time: Optional[datetime.time] = None
         self.first_run: bool = True
         self.stop: bool = False
-        self.notifications: bool = False
-        self.auto_stop: bool = False
-        self.logging: bool = False
+        self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
+        self.config_parser.read('NSE-Option-Chain-Analyzer.ini')
+        if not os.path.isfile('NSE-Option-Chain-Analyzer.ini'):
+            self.config_parser.add_section('main')
+            self.config_parser.set('main', 'notifications', 'False')
+            self.config_parser.set('main', 'auto_stop', 'False')
+            self.config_parser.set('main', 'logging', 'False')
+            with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+                self.config_parser.write(f)
+        self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
+        self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
+        self.logging: bool = not self.config_parser.getboolean('main', 'logging')
+        if not self.logging:
+            self.log()
+        else:
+            self.logging = False
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
         self.headers: Dict[str, str] = {
@@ -243,11 +257,11 @@ class Nse:
 
         if not self.stop:
             self.stop = True
-            self.options.entryconfig(self.options.index(0), label="Start   (Ctrl+X)")
+            self.options.entryconfig(self.options.index(0), label="Start")
             messagebox.showinfo(title="Stopped", message="Retrieving new data has been stopped.")
         else:
             self.stop = False
-            self.options.entryconfig(self.options.index(0), label="Stop   (Ctrl+X)")
+            self.options.entryconfig(self.options.index(0), label="Stop")
             messagebox.showinfo(title="Started", message="Retrieving new data has been started.")
 
             self.main()
@@ -278,26 +292,35 @@ class Nse:
     def toggle_notifications(self, event: Optional[Event] = None) -> None:
         if self.notifications:
             self.notifications = False
-            self.options.entryconfig(self.options.index(2), label="Notifications: Off   (Ctrl+N)")
+            self.config_parser.set('main', 'notifications', 'False')
+            self.options.entryconfig(self.options.index(2), label="Notifications: Off")
             messagebox.showinfo(title="Notifications Disabled",
                                 message="You will not receive any Notifications.")
         else:
             self.notifications = True
-            self.options.entryconfig(self.options.index(2), label="Notifications: On   (Ctrl+N)")
+            self.config_parser.set('main', 'notifications', 'True')
+            self.options.entryconfig(self.options.index(2), label="Notifications: On")
             messagebox.showinfo(title="Notifications Enabled",
                                 message="You will receive Notifications when the state of a label changes.")
 
+        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+            self.config_parser.write(f)
+
+    # noinspection PyUnusedLocal
     def toggle_auto_stop(self, event: Optional[Event] = None) -> None:
         if self.auto_stop:
             self.auto_stop = False
+            self.config_parser.set('main', 'auto_stop', 'False')
+            self.options.entryconfig(self.options.index(3), label="Stop automatically at 3:30pm: Off")
             messagebox.showinfo(title="Auto Stop Disabled", message="Program will not automatically stop at 3:30pm")
-            if event is not None:
-                self.options.entryconfig(self.options.index(3), onvalue=1, offvalue=0)
         else:
             self.auto_stop = True
+            self.config_parser.set('main', 'auto_stop', 'True')
+            self.options.entryconfig(self.options.index(3), label="Stop automatically at 3:30pm: On")
             messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
-            if event is not None:
-                self.options.entryconfig(self.options.index(3), onvalue=0, offvalue=1)
+
+        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+            self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
     def log(self, event: Optional[Event] = None) -> None:
@@ -305,16 +328,26 @@ class Nse:
             streamtologger.redirect(target="NSE-Option-Chain-Analyzer.log",
                                     header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
-            self.options.entryconfig(self.options.index(5), label="Logging: On   (Ctrl+L)")
-            messagebox.showinfo(title="Debug Logging Enabled",
-                                message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
+            print('----------Logging Started----------')
+            self.config_parser.set('main', 'logging', 'True')
+            try:
+                self.options.entryconfig(self.options.index(5), label="Logging: On")
+                messagebox.showinfo(title="Debug Logging Enabled",
+                                    message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
+            except AttributeError as err:
+                print(err)  # TODO: Number all errors
         elif self.logging:
             sys.stdout = self.stdout
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(5), label="Logging: Off   (Ctrl+L)")
+            print('----------Logging Stopped----------')
+            self.config_parser.set('main', 'logging', 'False')
+            self.options.entryconfig(self.options.index(5), label="Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
+
+        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+            self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
     def links(self, link: str, event: Optional[Event] = None) -> None:
@@ -391,6 +424,7 @@ class Nse:
                                              default='no')
         if ask_quit:
             self.session.close()
+            print('----------Quitting Program----------')
             self.root.destroy()
             sys.exit()
         elif not ask_quit:
@@ -413,15 +447,17 @@ class Nse:
 
         menubar: Menu = Menu(self.root)
         self.options: Menu = Menu(menubar, tearoff=0)
-        self.options.add_command(label="Stop   (Ctrl+X)", command=self.change_state)
-        self.options.add_command(label="Export to CSV   (Ctrl+S)", command=self.export)
-        self.options.add_command(label="Notifications: Off   (Ctrl+N)", command=self.toggle_notifications)
-        self.options.add_checkbutton(label="Stop automatically at 3:30pm   (Ctrl+K)", onvalue=1, offvalue=0,
-                                     command=self.toggle_auto_stop)
+        self.options.add_command(label="Stop", accelerator="(Ctrl+X)",  command=self.change_state)
+        self.options.add_command(label="Export to CSV", accelerator="(Ctrl+S)", command=self.export)
+        self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
+                                 accelerator="(Ctrl+N)", command=self.toggle_notifications)
+        self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
+                                 accelerator="(Ctrl+K)", command=self.toggle_auto_stop)
         self.options.add_separator()
-        self.options.add_command(label="Logging: Off   (Ctrl+L)", command=self.log)
-        self.options.add_command(label="About", command=self.about)
-        self.options.add_command(label="Quit   (Ctrl+Q)", command=self.close)
+        self.options.add_command(label=f"Debug Logging: {'On' if self.logging else 'Off'}", accelerator="(Ctrl+L)",
+                                 command=self.log)
+        self.options.add_command(label="About", accelerator="(Ctrl+M)", command=self.about)
+        self.options.add_command(label="Quit", accelerator="(Ctrl+Q)", command=self.close)
         menubar.add_cascade(label="Menu", menu=self.options)
         self.root.config(menu=menubar)
 
@@ -430,6 +466,7 @@ class Nse:
         self.root.bind('<Control-n>', self.toggle_notifications)
         self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-l>', self.log)
+        self.root.bind('<Control-m>', self.about)
         self.root.bind('<Control-q>', self.close)
 
         top_frame: Frame = Frame(self.root)
@@ -978,7 +1015,7 @@ class Nse:
             self.first_run = False
         if self.str_current_time == '15:30:00' and not self.stop and self.auto_stop:
             self.stop = True
-            self.options.entryconfig(self.options.index(0), label="Start   (Ctrl+X)")
+            self.options.entryconfig(self.options.index(0), label="Start")
             messagebox.showinfo(title="Market Closed", message="Retrieving new data has been stopped.")
             return
         self.root.after((self.seconds * 1000), self.main)
