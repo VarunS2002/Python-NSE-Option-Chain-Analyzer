@@ -28,13 +28,13 @@ class Nse:
         self.first_run: bool = True
         self.stop: bool = False
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
-        self.config_parser.read('NSE-Option-Chain-Analyzer.ini')
-        if not os.path.isfile('NSE-Option-Chain-Analyzer.ini'):
+        self.config_parser.read('NSE-OCA.ini')
+        if not os.path.isfile('NSE-OCA.ini'):
             self.config_parser.add_section('main')
             self.config_parser.set('main', 'notifications', 'False')
             self.config_parser.set('main', 'auto_stop', 'False')
             self.config_parser.set('main', 'logging', 'False')
-            with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+            with open('NSE-OCA.ini', 'w') as f:
                 self.config_parser.write(f)
         self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
         self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
@@ -303,7 +303,7 @@ class Nse:
             messagebox.showinfo(title="Notifications Enabled",
                                 message="You will receive Notifications when the state of a label changes.")
 
-        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+        with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
@@ -319,13 +319,13 @@ class Nse:
             self.options.entryconfig(self.options.index(3), label="Stop automatically at 3:30pm: On")
             messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
 
-        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+        with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
     def log(self, event: Optional[Event] = None) -> None:
         if not self.logging:
-            streamtologger.redirect(target="NSE-Option-Chain-Analyzer.log",
+            streamtologger.redirect(target="NSE-OCA.log",
                                     header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
             print('----------Logging Started----------')
@@ -333,7 +333,7 @@ class Nse:
             try:
                 self.options.entryconfig(self.options.index(5), label="Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
-                                    message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
+                                    message="Errors will be logged to NSE-OCA.log.")
             except AttributeError:
                 pass
         elif self.logging:
@@ -346,7 +346,7 @@ class Nse:
             self.options.entryconfig(self.options.index(5), label="Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
-        with open('NSE-Option-Chain-Analyzer.ini', 'w') as f:
+        with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
