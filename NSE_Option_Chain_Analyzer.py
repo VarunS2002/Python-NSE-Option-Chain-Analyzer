@@ -605,6 +605,11 @@ class Nse:
                                  "PE" in data and str(data['expiryDate'].lower() == str(self.expiry_date).lower())]
         underlying_stock: str = ce_values[0]['underlying']
         points: float = pe_values[0]['underlyingValue']
+        if points == 0:
+            for item in pe_values:
+                if item['underlyingValue'] != 0:
+                    points = item['underlyingValue']
+                    break
         ce_data: pandas.DataFrame = pandas.DataFrame(ce_values)
         pe_data: pandas.DataFrame = pandas.DataFrame(pe_values)
         ce_data_f: pandas.DataFrame = ce_data.loc[ce_data['expiryDate'] == self.expiry_date]
