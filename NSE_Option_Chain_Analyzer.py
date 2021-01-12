@@ -19,7 +19,6 @@ import streamtologger
 # noinspection PyAttributeOutsideInit
 class Nse:
     def __init__(self, window: Tk) -> None:
-        self.seconds: int = 60
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
         self.stdout: TextIO = sys.stdout
         self.stderr: TextIO = sys.stderr
@@ -28,21 +27,11 @@ class Nse:
         self.first_run: bool = True
         self.stop: bool = False
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
-        self.config_parser.read('NSE-OCA.ini')
         if not os.path.isfile('NSE-OCA.ini'):
-            self.config_parser.add_section('main')
-            self.config_parser.set('main', 'notifications', 'False')
-            self.config_parser.set('main', 'auto_stop', 'False')
-            self.config_parser.set('main', 'logging', 'False')
-            with open('NSE-OCA.ini', 'w') as f:
-                self.config_parser.write(f)
-        self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
-        self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
-        self.logging: bool = not self.config_parser.getboolean('main', 'logging')
-        if not self.logging:
+            self.create_config()
+        self.get_config()
+        if self.logging:
             self.log()
-        else:
-            self.logging = False
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
         self.headers: Dict[str, str] = {
@@ -66,6 +55,36 @@ class Nse:
             base_path = os.path.abspath(".")
         return os.path.join(base_path, 'nse_logo.ico')
 
+    def create_config(self, corrupted: bool = False) -> None:
+        if corrupted:
+            os.remove('NSE-OCA.ini')
+            self.config_parser = configparser.ConfigParser()
+
+        self.config_parser.read('NSE-OCA.ini')
+        self.config_parser.add_section('main')
+        self.config_parser.set('main', 'index', 'NIFTY')
+        self.config_parser.set('main', 'seconds', '60')
+        self.config_parser.set('main', 'notifications', 'False')
+        self.config_parser.set('main', 'auto_stop', 'False')
+        self.config_parser.set('main', 'logging', 'False')
+
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
+
+    def get_config(self) -> None:
+        try:
+            self.config_parser.read('NSE-OCA.ini')
+            self.index: str = self.config_parser.get('main', 'index')
+            self.seconds: int = self.config_parser.getint('main', 'seconds')
+            self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
+            self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
+            self.logging: bool = self.config_parser.getboolean('main', 'logging')
+        except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
+                configparser.DuplicateSectionError) as err:
+            print(err, "0")
+            self.create_config(True)
+            return self.get_config()
+
     # noinspection PyUnusedLocal
     def get_data(self, event: Optional[Event] = None) -> Optional[Tuple[Optional[requests.Response], Any]]:
         if self.first_run:
@@ -76,7 +95,10 @@ class Nse:
     def get_data_first_run(self) -> Optional[Tuple[Optional[requests.Response], Any]]:
         request: Optional[requests.Response] = None
         response: Optional[requests.Response] = None
-        self.index: str = self.index_var.get()
+        self.index = self.index_var.get()
+        self.config_parser.set('main', 'index', f'{self.index}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
         try:
             url: str = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
             request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
@@ -198,6 +220,7 @@ class Nse:
         self.index_menu: Combobox = Combobox(self.login, textvariable=self.index_var, values=self.indices)
         self.index_menu.config(width=15)
         self.index_menu.grid(row=0, column=1, sticky=N + S + E)
+        self.index_menu.current(self.indices.index(self.index))
         date_label: Label = Label(self.login, text="Expiry Date: ", justify=LEFT)
         date_label.grid(row=1, column=0, sticky=N + S + W)
         self.date_menu: Combobox = Combobox(self.login, textvariable=self.dates_var)
@@ -217,7 +240,7 @@ class Nse:
                                                  values=tuple(self.intervals))
         self.intervals_menu.config(width=15)
         self.intervals_menu.grid(row=3, column=1, sticky=N + S + E)
-        self.intervals_menu.current(0)
+        self.intervals_menu.current(self.intervals.index(int(self.seconds / 60)))
         self.sp_entry.focus_set()
         self.get_data()
 
@@ -239,6 +262,9 @@ class Nse:
     # noinspection PyUnusedLocal
     def start(self, event: Optional[Event] = None) -> None:
         self.seconds = int(self.intervals_var.get()) * 60
+        self.config_parser.set('main', 'seconds', f'{self.seconds}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
         self.expiry_date: str = self.dates_var.get()
         if self.expiry_date == "":
             messagebox.showerror(title="Error", message="Incorrect Expiry Date.\nPlease enter correct Expiry Date.")
@@ -324,7 +350,7 @@ class Nse:
 
     # noinspection PyUnusedLocal
     def log(self, event: Optional[Event] = None) -> None:
-        if not self.logging:
+        if self.first_run and self.logging or not self.logging:
             streamtologger.redirect(target="NSE-OCA.log",
                                     header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
@@ -337,11 +363,11 @@ class Nse:
             except AttributeError:
                 pass
         elif self.logging:
+            print('----------Logging Stopped----------')
             sys.stdout = self.stdout
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            print('----------Logging Stopped----------')
             self.config_parser.set('main', 'logging', 'False')
             self.options.entryconfig(self.options.index(5), label="Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
