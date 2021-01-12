@@ -44,7 +44,7 @@ class Nse:
         else:
             self.logging = False
         self.dates: List[str] = [""]
-        self.indices: List[str] = ["NIFTY", "BANKNIFTY", "NIFTYIT"]
+        self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) '
