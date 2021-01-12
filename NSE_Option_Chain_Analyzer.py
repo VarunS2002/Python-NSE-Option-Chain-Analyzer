@@ -62,8 +62,7 @@ class Nse:
         try:
             # noinspection PyProtectedMember,PyUnresolvedReferences
             base_path = sys._MEIPASS
-        except AttributeError as err:
-            print(err, "0")
+        except AttributeError:
             base_path = os.path.abspath(".")
         return os.path.join(base_path, 'nse_logo.ico')
 
@@ -119,8 +118,8 @@ class Nse:
         try:
             self.date_menu.config(values=tuple(self.dates))
             self.date_menu.current(0)
-        except TclError as err:
-            print(err, "4")
+        except TclError:
+            pass
 
         return response, json_data
 
@@ -141,7 +140,7 @@ class Nse:
         except Exception as err:
             print(request)
             print(response)
-            print(err, "5")
+            print(err, "4")
             try:
                 self.session.close()
                 self.session = requests.Session()
@@ -153,14 +152,14 @@ class Nse:
             except Exception as err:
                 print(request)
                 print(response)
-                print(err, "6")
+                print(err, "5")
                 return
         if response is not None:
             try:
                 json_data: Any = response.json()
             except Exception as err:
                 print(response)
-                print(err, "7")
+                print(err, "6")
                 json_data = {}
         else:
             json_data = {}
@@ -249,7 +248,7 @@ class Nse:
             self.login.destroy()
             self.main_win()
         except ValueError as err:
-            print(err, "8")
+            print(err, "7")
             messagebox.showerror(title="Error", message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
 
     # noinspection PyUnusedLocal
@@ -285,7 +284,7 @@ class Nse:
             messagebox.showinfo(title="Export Successful",
                                 message=f"Data has been exported to NSE-OCA-{self.index}-{self.expiry_date}.csv.")
         except Exception as err:
-            print(err, "9")
+            print(err, "8")
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
@@ -335,8 +334,8 @@ class Nse:
                 self.options.entryconfig(self.options.index(5), label="Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-Option-Chain-Analyzer.log.")
-            except AttributeError as err:
-                print(err, "10")
+            except AttributeError:
+                pass
         elif self.logging:
             sys.stdout = self.stdout
             sys.stderr = self.stderr
@@ -945,7 +944,7 @@ class Nse:
         try:
             index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
-            print(err, "11")
+            print(err, "9")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
