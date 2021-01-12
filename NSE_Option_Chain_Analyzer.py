@@ -269,20 +269,21 @@ class Nse:
     # noinspection PyUnusedLocal
     def export(self, event: Optional[Event] = None) -> None:
         sheet_data: List[List[str]] = self.sheet.get_sheet_data()
-        csv_exists = os.path.isfile("NSE-Option-Chain-Analyzer.csv")
-        if not csv_exists:
-            with open("NSE-Option-Chain-Analyzer.csv", "a", newline="") as row:
-                data_writer: csv.writer = csv.writer(row)
-                data_writer.writerow((
-                    'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
-                    'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
+        csv_exists: bool = os.path.isfile(f"NSE-OCA-{self.index}-{self.expiry_date}.csv")
         try:
-            with open("NSE-Option-Chain-Analyzer.csv", "a", newline="") as row:
+            if not csv_exists:
+                with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                    data_writer: csv.writer = csv.writer(row)
+                    data_writer.writerow((
+                        'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
+                        'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
+
+            with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
                 data_writer: csv.writer = csv.writer(row)
                 data_writer.writerows(sheet_data)
 
             messagebox.showinfo(title="Export Successful",
-                                message="Data has been exported to NSE-Option-Chain-Analyzer.csv.")
+                                message=f"Data has been exported to NSE-OCA-{self.index}-{self.expiry_date}.csv.")
         except Exception as err:
             print(err, "9")
             messagebox.showerror(title="Export Failed",
@@ -447,7 +448,7 @@ class Nse:
 
         menubar: Menu = Menu(self.root)
         self.options: Menu = Menu(menubar, tearoff=0)
-        self.options.add_command(label="Stop", accelerator="(Ctrl+X)",  command=self.change_state)
+        self.options.add_command(label="Stop", accelerator="(Ctrl+X)", command=self.change_state)
         self.options.add_command(label="Export to CSV", accelerator="(Ctrl+S)", command=self.export)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
                                  accelerator="(Ctrl+N)", command=self.toggle_notifications)
