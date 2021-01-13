@@ -444,7 +444,8 @@ class Nse:
 
         return self.info
 
-    def about(self) -> None:
+    # noinspection PyUnusedLocal
+    def about(self, event: Optional[Event] = None) -> None:
         self.info: Toplevel = self.about_window()
         self.info.rowconfigure(0, weight=1)
         self.info.rowconfigure(1, weight=1)
