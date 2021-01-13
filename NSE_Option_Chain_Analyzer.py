@@ -47,6 +47,7 @@ class Nse:
 
     @staticmethod
     def get_icon_path() -> str:
+        base_path: str
         try:
             # noinspection PyProtectedMember,PyUnresolvedReferences
             base_path = sys._MEIPASS
