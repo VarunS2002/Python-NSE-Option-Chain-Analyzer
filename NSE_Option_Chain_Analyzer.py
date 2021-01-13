@@ -1,19 +1,20 @@
-from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
-import sys
-import os
-import datetime
-import webbrowser
-import csv
 import configparser
+import csv
+import datetime
+import os
+import sys
+import webbrowser
 from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
     Label, Entry, SOLID, RIDGE, N, S, E, W, LEFT, messagebox
 from tkinter.ttk import Combobox, Button
-import tksheet
+from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
+
 import numpy
 import pandas
 import requests
-import win10toast
 import streamtologger
+import tksheet
+import win10toast
 
 
 # noinspection PyAttributeOutsideInit
