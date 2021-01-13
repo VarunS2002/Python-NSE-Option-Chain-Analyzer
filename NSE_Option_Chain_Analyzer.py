@@ -228,7 +228,7 @@ class Nse:
         self.date_menu.grid(row=1, column=1, sticky=N + S + E)
         self.date_get: Button = Button(self.login, text="Refresh", command=self.get_data, width=10)
         self.date_get.grid(row=1, column=2, sticky=N + S + E + W)
-        sp_label: Label = Label(self.login, text="Strike Price (eg. 11850): ")
+        sp_label: Label = Label(self.login, text="Strike Price (eg. 14750): ")
         sp_label.grid(row=2, column=0, sticky=N + S + W)
         self.sp_entry = Entry(self.login, width=18, relief=SOLID)
         self.sp_entry.grid(row=2, column=1, sticky=N + S + E)
@@ -350,6 +350,7 @@ class Nse:
         self.config_parser.set('main', 'live_export', f'{self.live_export}')
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
+        self.export_row(None)
 
     # noinspection PyUnusedLocal
     def toggle_notifications(self, event: Optional[Event] = None) -> None:
