@@ -27,11 +27,9 @@ class Nse:
         self.first_run: bool = True
         self.stop: bool = False
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
-        if not os.path.isfile('NSE-OCA.ini'):
-            self.create_config()
+        self.create_config() if not os.path.isfile('NSE-OCA.ini') else None
         self.get_config()
-        if self.logging:
-            self.log()
+        self.log() if self.logging else None
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
         self.headers: Dict[str, str] = {
@@ -64,6 +62,7 @@ class Nse:
         self.config_parser.add_section('main')
         self.config_parser.set('main', 'index', 'NIFTY')
         self.config_parser.set('main', 'seconds', '60')
+        self.config_parser.set('main', 'live_export', 'False')
         self.config_parser.set('main', 'notifications', 'False')
         self.config_parser.set('main', 'auto_stop', 'False')
         self.config_parser.set('main', 'logging', 'False')
@@ -76,6 +75,7 @@ class Nse:
             self.config_parser.read('NSE-OCA.ini')
             self.index: str = self.config_parser.get('main', 'index')
             self.seconds: int = self.config_parser.getint('main', 'seconds')
+            self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
@@ -269,6 +269,8 @@ class Nse:
         if self.expiry_date == "":
             messagebox.showerror(title="Error", message="Incorrect Expiry Date.\nPlease enter correct Expiry Date.")
             return
+        if self.live_export:
+            self.export_row(None)
         try:
             self.sp: int = int(self.sp_entry.get())
             self.login.destroy()
@@ -314,21 +316,55 @@ class Nse:
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
+    def export_row(self, values: Optional[List[Union[str, float, numpy.float64]]]) -> None:
+        if values is None:
+            csv_exists: bool = os.path.isfile(f"NSE-OCA-{self.index}-{self.expiry_date}.csv")
+            try:
+                if not csv_exists:
+                    with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                        data_writer: csv.writer = csv.writer(row)
+                        data_writer.writerow((
+                            'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
+                            'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
+            except Exception as err:
+                print(err, "9")
+        else:
+            with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                data_writer: csv.writer = csv.writer(row)
+                data_writer.writerow(values)
+
+    # noinspection PyUnusedLocal
+    def toggle_live_export(self, event: Optional[Event] = None) -> None:
+        if self.live_export:
+            self.live_export = False
+            self.options.entryconfig(self.options.index(2), label="Live Exporting to CSV: Off")
+            messagebox.showinfo(title="Live Exporting Disabled",
+                                message="Data rows will not be exported.")
+        else:
+            self.live_export = True
+            self.options.entryconfig(self.options.index(2), label="Live Exporting to CSV: On")
+            messagebox.showinfo(title="Live Exporting Enabled",
+                                message=f"Data rows will be exported in real time to "
+                                        f"NSE-OCA-{self.index}-{self.expiry_date}.csv.")
+
+        self.config_parser.set('main', 'live_export', f'{self.live_export}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
+
     # noinspection PyUnusedLocal
     def toggle_notifications(self, event: Optional[Event] = None) -> None:
         if self.notifications:
             self.notifications = False
-            self.config_parser.set('main', 'notifications', 'False')
-            self.options.entryconfig(self.options.index(2), label="Notifications: Off")
+            self.options.entryconfig(self.options.index(3), label="Notifications: Off")
             messagebox.showinfo(title="Notifications Disabled",
                                 message="You will not receive any Notifications.")
         else:
             self.notifications = True
-            self.config_parser.set('main', 'notifications', 'True')
-            self.options.entryconfig(self.options.index(2), label="Notifications: On")
+            self.options.entryconfig(self.options.index(3), label="Notifications: On")
             messagebox.showinfo(title="Notifications Enabled",
                                 message="You will receive Notifications when the state of a label changes.")
 
+        self.config_parser.set('main', 'notifications', f'{self.notifications}')
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
@@ -336,15 +372,14 @@ class Nse:
     def toggle_auto_stop(self, event: Optional[Event] = None) -> None:
         if self.auto_stop:
             self.auto_stop = False
-            self.config_parser.set('main', 'auto_stop', 'False')
-            self.options.entryconfig(self.options.index(3), label="Stop automatically at 3:30pm: Off")
+            self.options.entryconfig(self.options.index(4), label="Stop automatically at 3:30pm: Off")
             messagebox.showinfo(title="Auto Stop Disabled", message="Program will not automatically stop at 3:30pm")
         else:
             self.auto_stop = True
-            self.config_parser.set('main', 'auto_stop', 'True')
-            self.options.entryconfig(self.options.index(3), label="Stop automatically at 3:30pm: On")
+            self.options.entryconfig(self.options.index(4), label="Stop automatically at 3:30pm: On")
             messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
 
+        self.config_parser.set('main', 'auto_stop', f'{self.auto_stop}')
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
@@ -355,9 +390,8 @@ class Nse:
                                     header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
             print('----------Logging Started----------')
-            self.config_parser.set('main', 'logging', 'True')
             try:
-                self.options.entryconfig(self.options.index(5), label="Logging: On")
+                self.options.entryconfig(self.options.index(6), label="Debug Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-OCA.log.")
             except AttributeError:
@@ -368,10 +402,10 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.config_parser.set('main', 'logging', 'False')
-            self.options.entryconfig(self.options.index(5), label="Logging: Off")
+            self.options.entryconfig(self.options.index(6), label="Debug Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
+        self.config_parser.set('main', 'logging', f'{self.logging}')
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
 
@@ -475,6 +509,8 @@ class Nse:
         self.options: Menu = Menu(menubar, tearoff=0)
         self.options.add_command(label="Stop", accelerator="(Ctrl+X)", command=self.change_state)
         self.options.add_command(label="Export to CSV", accelerator="(Ctrl+S)", command=self.export)
+        self.options.add_command(label=f"Live Exporting to CSV: {'On' if self.live_export else 'Off'}",
+                                 accelerator="(Ctrl+B)", command=self.toggle_live_export)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
                                  accelerator="(Ctrl+N)", command=self.toggle_notifications)
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
@@ -489,6 +525,7 @@ class Nse:
 
         self.root.bind('<Control-x>', self.change_state)
         self.root.bind('<Control-s>', self.export)
+        self.root.bind('<Control-b>', self.toggle_live_export)
         self.root.bind('<Control-n>', self.toggle_notifications)
         self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-l>', self.log)
@@ -802,6 +839,8 @@ class Nse:
                                                                  self.call_boundary, self.put_boundary, self.call_itm,
                                                                  self.put_itm]
         self.sheet.insert_row(values=output_values)
+        if self.live_export:
+            self.export_row(output_values)
 
         last_row: int = self.sheet.get_total_rows() - 1
 
@@ -975,7 +1014,7 @@ class Nse:
         try:
             index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
-            print(err, "9")
+            print(err, "10")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
