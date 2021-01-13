@@ -393,6 +393,14 @@ class Nse:
                                     header_format="[{timestamp:%Y-%m-%d %H:%M:%S} - {level:5}] ")
             self.logging = True
             print('----------Logging Started----------')
+
+            try:
+                # noinspection PyProtectedMember,PyUnresolvedReferences
+                base_path: str = sys._MEIPASS
+                print('.exe version')
+            except AttributeError:
+                print('.py version')
+
             try:
                 self.options.entryconfig(self.options.index(6), label="Debug Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
