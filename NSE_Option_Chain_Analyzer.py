@@ -468,7 +468,7 @@ class Nse:
         readme: Label = Label(self.info, text="README", fg="blue", cursor="hand2", relief=RIDGE)
         readme.bind("<Button-1>", lambda click, link="readme": self.links(link, click))
         readme.grid(row=3, column=0, sticky=N + S + W + E)
-        licenses: Label = Label(self.info, text="License", fg="blue", cursor="hand2", relief=RIDGE)
+        licenses: Label = Label(self.info, text="LICENSE", fg="blue", cursor="hand2", relief=RIDGE)
         licenses.bind("<Button-1>", lambda click, link="license": self.links(link, click))
         licenses.grid(row=3, column=1, sticky=N + S + W + E)
         releases: Label = Label(self.info, text="Releases", fg="blue", cursor="hand2", relief=RIDGE)
