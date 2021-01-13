@@ -510,7 +510,7 @@ class Nse:
         menubar: Menu = Menu(self.root)
         self.options: Menu = Menu(menubar, tearoff=0)
         self.options.add_command(label="Stop", accelerator="(Ctrl+X)", command=self.change_state)
-        self.options.add_command(label="Export to CSV", accelerator="(Ctrl+S)", command=self.export)
+        self.options.add_command(label="Export all to CSV", accelerator="(Ctrl+S)", command=self.export)
         self.options.add_command(label=f"Live Exporting to CSV: {'On' if self.live_export else 'Off'}",
                                  accelerator="(Ctrl+B)", command=self.toggle_live_export)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
