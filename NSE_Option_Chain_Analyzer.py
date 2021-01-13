@@ -80,7 +80,7 @@ class Nse:
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
         except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
-                configparser.DuplicateSectionError) as err:
+                configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
             print(err, "0")
             self.create_config(True)
             return self.get_config()
