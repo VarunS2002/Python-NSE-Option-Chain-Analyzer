@@ -19,6 +19,8 @@ import win10toast
 
 # noinspection PyAttributeOutsideInit
 class Nse:
+    version: str = '3.7'
+
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
         self.stdout: TextIO = sys.stdout
@@ -55,6 +57,31 @@ class Nse:
             base_path = os.path.abspath(".")
         return os.path.join(base_path, 'nse_logo.ico')
 
+    def check_for_updates(self, auto: bool = True) -> None:
+        release_data: requests.Response = requests.get(
+            "https://api.github.com/repos/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/latest")
+        latest_version: str = release_data.json()['tag_name']
+
+        if float(latest_version) > float(Nse.version):
+            self.info.attributes('-topmost', False) if not auto else None
+            update: bool = messagebox.askyesno(
+                title="New Update Available",
+                message=f"You are running version: {Nse.version}\n"
+                        f"Latest version: {latest_version}\n"
+                        f"Do you want to update now ?\n"
+                        f"{'You can disable auto check for updates from the menu.' if auto and self.update else ''}")
+            if update:
+                webbrowser.open_new("https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/latest")
+                self.info.attributes('-topmost', False) if not auto else None
+            else:
+                self.info.attributes('-topmost', True) if not auto else None
+        else:
+            if not auto:
+                self.info.attributes('-topmost', False)
+                messagebox.showinfo(title="No Updates Available", message=f"You are running the latest version.\n"
+                                                                          f"Version: {Nse.version}")
+                self.info.attributes('-topmost', True)
+
     def create_config(self, corrupted: bool = False) -> None:
         if corrupted:
             os.remove('NSE-OCA.ini')
@@ -67,6 +94,7 @@ class Nse:
         self.config_parser.set('main', 'live_export', 'False')
         self.config_parser.set('main', 'notifications', 'False')
         self.config_parser.set('main', 'auto_stop', 'False')
+        self.config_parser.set('main', 'update', 'True')
         self.config_parser.set('main', 'logging', 'False')
 
         with open('NSE-OCA.ini', 'w') as f:
@@ -80,6 +108,7 @@ class Nse:
             self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
+            self.update: bool = self.config_parser.getboolean('main', 'update')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
         except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
                 configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
@@ -387,6 +416,23 @@ class Nse:
             self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
+    def toggle_updates(self, event: Optional[Event] = None) -> None:
+        if self.update:
+            self.update = False
+            self.options.entryconfig(self.options.index(6), label="Auto Check for Updates: Off")
+            messagebox.showinfo(title="Auto Checking for Updates Disabled",
+                                message="Program will not check for updates at start.")
+        else:
+            self.update = True
+            self.options.entryconfig(self.options.index(6), label="Auto Check for Updates: On")
+            messagebox.showinfo(title="Auto Checking for Updates Enabled",
+                                message="Program will check for updates at start.")
+
+        self.config_parser.set('main', 'update', f'{self.update}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
+
+    # noinspection PyUnusedLocal
     def log(self, event: Optional[Event] = None) -> None:
         if self.first_run and self.logging or not self.logging:
             streamtologger.redirect(target="NSE-OCA.log",
@@ -402,7 +448,7 @@ class Nse:
                 print('.py version')
 
             try:
-                self.options.entryconfig(self.options.index(6), label="Debug Logging: On")
+                self.options.entryconfig(self.options.index(7), label="Debug Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-OCA.log.")
             except AttributeError:
@@ -413,7 +459,7 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(6), label="Debug Logging: Off")
+            self.options.entryconfig(self.options.index(7), label="Debug Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
         self.config_parser.set('main', 'logging', f'{self.logging}')
@@ -468,7 +514,7 @@ class Nse:
         heading.grid(row=0, column=0, columnspan=2, sticky=N + S + W + E)
         version_label: Label = Label(self.info, text="Version:", relief=RIDGE)
         version_label.grid(row=1, column=0, sticky=N + S + W + E)
-        version_val: Label = Label(self.info, text="3.7", relief=RIDGE)
+        version_val: Label = Label(self.info, text=f"{Nse.version}", relief=RIDGE)
         version_val.grid(row=1, column=1, sticky=N + S + W + E)
         dev_label: Label = Label(self.info, text="Developer:", relief=RIDGE)
         dev_label.grid(row=2, column=0, sticky=N + S + W + E)
@@ -487,7 +533,9 @@ class Nse:
         sources: Label = Label(self.info, text="Sources", fg="blue", cursor="hand2", relief=RIDGE)
         sources.bind("<Button-1>", lambda click, link="sources": self.links(link, click))
         sources.grid(row=4, column=1, sticky=N + S + W + E)
-
+        updates: Button = Button(self.info, text="Check for Updates",
+                                 command=lambda auto=False: self.check_for_updates(auto))
+        updates.grid(row=5, column=0, columnspan=2, sticky=N + S + W + E)
         self.info.mainloop()
 
     # noinspection PyUnusedLocal
@@ -528,6 +576,8 @@ class Nse:
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
                                  accelerator="(Ctrl+K)", command=self.toggle_auto_stop)
         self.options.add_separator()
+        self.options.add_command(label=f"Auto Check for Updates: {'On' if self.update else 'Off'}",
+                                 accelerator="(Ctrl+U)", command=self.toggle_updates)
         self.options.add_command(label=f"Debug Logging: {'On' if self.logging else 'Off'}", accelerator="(Ctrl+L)",
                                  command=self.log)
         self.options.add_command(label="About", accelerator="(Ctrl+M)", command=self.about)
@@ -540,6 +590,7 @@ class Nse:
         self.root.bind('<Control-b>', self.toggle_live_export)
         self.root.bind('<Control-n>', self.toggle_notifications)
         self.root.bind('<Control-k>', self.toggle_auto_stop)
+        self.root.bind('<Control-u>', self.toggle_updates)
         self.root.bind('<Control-l>', self.log)
         self.root.bind('<Control-m>', self.about)
         self.root.bind('<Control-q>', self.close)
@@ -1094,6 +1145,8 @@ class Nse:
         self.set_values()
 
         if self.first_run:
+            if self.update:
+                self.check_for_updates()
             self.first_run = False
         if self.str_current_time == '15:30:00' and not self.stop and self.auto_stop:
             self.stop = True
