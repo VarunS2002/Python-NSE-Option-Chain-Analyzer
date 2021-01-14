@@ -443,9 +443,9 @@ class Nse:
             try:
                 # noinspection PyProtectedMember,PyUnresolvedReferences
                 base_path: str = sys._MEIPASS
-                print('.exe version')
+                print('.exe version : ' + Nse.version)
             except AttributeError:
-                print('.py version')
+                print('.py version : ' + Nse.version)
 
             try:
                 self.options.entryconfig(self.options.index(7), label="Debug Logging: On")
