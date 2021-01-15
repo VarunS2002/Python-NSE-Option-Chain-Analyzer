@@ -19,7 +19,7 @@ import win10toast
 
 # noinspection PyAttributeOutsideInit
 class Nse:
-    version: str = '3.7'
+    version: str = '4.0'
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]

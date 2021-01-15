@@ -1,8 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![New-Site: v3.7](https://img.shields.io/badge/New--Site-v3.7-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.7)
-[![Old-Site: v2.0](https://img.shields.io/badge/Old--Site-v2.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
+[![Latest: v4.0](https://img.shields.io/badge/release-v4.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/4.0/NSE_Option_Chain_Analyzer_4.0.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -13,27 +12,29 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 ## Installation:
 
--Types of variants available:
+>#### Types of variants available:
  
  1. `.exe` (Windows Executable)
 
  2. `.py` (Python Source Code)
 
--Requirements for 1:
- 
- - Windows OS  
+- Does not support Linux
 
--Requirements for 2:
+- Requirements for 1:
  
- - Python 3.6+ 
+    - Windows OS  
+
+- Requirements for 2:
  
- - For Windows https://www.python.org/downloads/ is recommended
-
- - Add Python to PATH/Environment Variables during installation in Windows (recommended)
-
- - Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
-   
- - Install missing modules using `pip install -r requirements.txt`
+     - Python 3.6+ 
+     
+     - For Windows https://www.python.org/downloads/ is recommended
+    
+     - Add Python to PATH/Environment Variables during installation in Windows (recommended)
+    
+     - Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
+       
+     - Install missing modules using `pip install -r requirements.txt`
 
 ## Usage:
 
@@ -47,58 +48,85 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 ## Note:
 
--If there is an error in fetching dates then try refreshing
+- If there is an error in fetching dates then try refreshing
 
--If you face any issue or have a suggestion then feel free to open an issue. 
+- If you face any issue or have a suggestion then feel free to open an issue. 
 
--It is recommended to enable logging and then send the nse.log file or the console output for reporting issues  
+- It is recommended to enable logging and then send the NSE-OCA.log file or the console output for reporting issues  
 
--In case of network or connection errors the program doesn't crash and will keep retrying until manually stopped
+- In case of network or connection errors the program doesn't crash and will keep retrying until manually stopped
 
--If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
+- If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
 
--All data is retrieved from https://www.nseindia.com/api/option-chain-indices?symbol={index_name}
+- All data is retrieved from https://www.nseindia.com/api/option-chain-indices?symbol={index_name}
 
--[tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
+## Dependencies:
 
--[auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
+- [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
 
--[stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
+- [numpy](https://pypi.org/project/numpy/) is used for calculations
+
+- [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
+
+- [requests](https://pypi.org/project/requests/) is used for accessing and retrieving data from the NSE website 
+
+- [stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
+
+- [tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
+
+- [win10toast](https://pypi.org/project/win10toast/) is used for Windows Toast notifications
 
 ## Features:
 
--The program continuously retrieves and refreshes the option chain giving near real-time analysis to the traders
+- The program continuously retrieves and refreshes the option chain giving near real-time analysis to the traders
 
--New data row is added only if the NSE server updates its time or data (To prevent printing duplicate data)
+- New data rows are added only if the NSE server updates its time or data (To prevent displaying duplicate data)
 
--Supported Indices :
- * NIFTY
- * BANKNIFTY
- * NIFTYIT
+- Supported Indices :
+     * NIFTY
+     * BANKNIFTY
+     * FINNIFTY
 
--Red and Green colour indication for data based on trends
+- Supports multiple instances with different indices and strike prices selected
 
--Program title format: `NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}`
+- Red and Green colour indication for data based on trends
 
--Stop and Start functionality
+- Toast Notifications for notifying when trend changes
 
--You can select all table data using Ctrl+A or select individual cells, rows and columns 
+- Program title format: `NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}`
 
--Then you can copy it using Ctrl+C or right click menu
+- Stop and Start functionality
 
--You can then paste it in any spreadsheet application (Tested with MS Excel and Google Sheets)
+- You can select all table data using Ctrl+A or select individual cells, rows and columns 
 
--Export to .csv file option
+- Then you can copy it using Ctrl+C or right click menu
 
--Debug Logging toggle 
+- You can then paste it in any spreadsheet application (Tested with MS Excel and Google Sheets)
 
--About window with version and links for developer GitHub profile, README, license, releases and sources
+- Export all data to .csv file 
 
--PEP 8 format
+- Real time exporting data rows to .csv file
 
--Object Oriented
+- Auto stop the program at 3:30pm when the market closes
 
--Table Data displayed:
+- Auto Checking for updates
+
+- Debug Logging
+
+- Saves certain settings in a configuration file for subsequent runs. Saved Settings:
+     * Selected Index
+     * Refresh Interval
+     * Live Export
+     * Notifications
+     * Auto stop at 3:30pm
+     * Auto Check for Updates
+     * Debug Logging
+
+- Keyboard shortcuts for all options
+
+## Data Displayed
+
+>#### Table Data:
 
 Data | Description
 --- | ---
@@ -112,7 +140,7 @@ Put Boundary | Change in Put Open Interest for the given Strike Price. This is u
 Call In The Money(ITM) | This indicates that bullish trend could continue and Value could cross 4 Strike Prices above given Strike Price. It's calculated as the ratio of Put writing and Call writing at the 4th Strike Price above the given Strike price. If the absolute ratio > 1.5 then its bullish sign. 
 Put In The Money(ITM) | This indicates that bearish trend could continue and Value could cross 2 Strike Prices below given Strike Price. It's calculated as the ratio of Call writing and Put writing at the 2nd Strike Price below the given Strike price. If the absolute ratio > 1.5 then its bearish sign. 
 
--Label Data displayed:
+>#### Label Data:
 
 Data | Description
 --- | ---
@@ -128,18 +156,18 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 ## Screenshots:
 
--Login Page:
+- Login Page:
 
-![Login_Window](https://i.imgur.com/fxgKDBS.png)
+  <br>![Login_Window](https://i.imgur.com/vgoQzww.png) <br><br>
 
--Main Window:
+- Main Window:
 
-![Main_Window](https://i.imgur.com/iGpVH0X.png)
+  <br>![Main_Window](https://i.imgur.com/JHn58gn.png) <br><br>
 
--Selecting Data:
+- Selecting Data:
 
-![Selecting_Data](https://i.imgur.com/3J9NMVm.png)
+  <br>![Selecting_Data](https://i.imgur.com/qYoy2iO.png) <br><br>
 
--Option Menu
+- Option Menu
 
-![Option_Menu](https://i.imgur.com/B95NciH.png)
+  <br>![Option_Menu](https://i.imgur.com/POiN0Cr.png)
