@@ -59,7 +59,8 @@ class Nse:
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
-            "https://api.github.com/repos/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/latest")
+            "https://api.github.com/repos/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/latest",
+            headers=self.headers, timeout=5)
         latest_version: str = release_data.json()['tag_name']
 
         if float(latest_version) > float(Nse.version):
@@ -111,7 +112,7 @@ class Nse:
             self.update: bool = self.config_parser.getboolean('main', 'update')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
         except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
-                configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
+                configparser.DuplicateSectionError, configparser.DuplicateOptionError, ValueError) as err:
             print(err, "0")
             self.create_config(True)
             return self.get_config()
