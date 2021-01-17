@@ -565,7 +565,8 @@ class Nse:
                                              default='no')
         if ask_quit:
             self.session.close()
-            print('----------Quitting Program----------')
+            if self.logging:
+                print('----------Quitting Program----------')
             self.root.destroy()
             sys.exit()
         elif not ask_quit:
