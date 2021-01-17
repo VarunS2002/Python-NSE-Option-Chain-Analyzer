@@ -93,6 +93,7 @@ class Nse:
         self.config_parser.set('main', 'index', 'NIFTY')
         self.config_parser.set('main', 'seconds', '60')
         self.config_parser.set('main', 'live_export', 'False')
+        self.config_parser.set('main', 'save_oc', 'False')
         self.config_parser.set('main', 'notifications', 'False')
         self.config_parser.set('main', 'auto_stop', 'False')
         self.config_parser.set('main', 'update', 'True')
@@ -107,6 +108,7 @@ class Nse:
             self.index: str = self.config_parser.get('main', 'index')
             self.seconds: int = self.config_parser.getint('main', 'seconds')
             self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
+            self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
             self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             self.update: bool = self.config_parser.getboolean('main', 'update')
@@ -385,15 +387,33 @@ class Nse:
         self.export_row(None)
 
     # noinspection PyUnusedLocal
+    def toggle_save_oc(self, event: Optional[Event] = None) -> None:
+        if self.save_oc:
+            self.save_oc = False
+            self.options.entryconfig(self.options.index(3), label="Dump Entire Option Chain to CSV: Off")
+            messagebox.showinfo(title="Dump Entire Option Chain Disabled",
+                                message=f"Entire Option Chain data will not be exported.")
+        else:
+            self.save_oc = True
+            self.options.entryconfig(self.options.index(3), label="Dump Entire Option Chain to CSV: On")
+            messagebox.showinfo(title="Dump Entire Option Chain Enabled",
+                                message=f"Entire Option Chain data will be exported to "
+                                        f"NSE-OCA-{self.index}-{self.expiry_date}-Full.csv.")
+
+        self.config_parser.set('main', 'save_oc', f'{self.save_oc}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
+
+    # noinspection PyUnusedLocal
     def toggle_notifications(self, event: Optional[Event] = None) -> None:
         if self.notifications:
             self.notifications = False
-            self.options.entryconfig(self.options.index(3), label="Notifications: Off")
+            self.options.entryconfig(self.options.index(4), label="Notifications: Off")
             messagebox.showinfo(title="Notifications Disabled",
                                 message="You will not receive any Notifications.")
         else:
             self.notifications = True
-            self.options.entryconfig(self.options.index(3), label="Notifications: On")
+            self.options.entryconfig(self.options.index(4), label="Notifications: On")
             messagebox.showinfo(title="Notifications Enabled",
                                 message="You will receive Notifications when the state of a label changes.")
 
@@ -405,11 +425,11 @@ class Nse:
     def toggle_auto_stop(self, event: Optional[Event] = None) -> None:
         if self.auto_stop:
             self.auto_stop = False
-            self.options.entryconfig(self.options.index(4), label="Stop automatically at 3:30pm: Off")
+            self.options.entryconfig(self.options.index(5), label="Stop automatically at 3:30pm: Off")
             messagebox.showinfo(title="Auto Stop Disabled", message="Program will not automatically stop at 3:30pm")
         else:
             self.auto_stop = True
-            self.options.entryconfig(self.options.index(4), label="Stop automatically at 3:30pm: On")
+            self.options.entryconfig(self.options.index(5), label="Stop automatically at 3:30pm: On")
             messagebox.showinfo(title="Auto Stop Enabled", message="Program will automatically stop at 3:30pm")
 
         self.config_parser.set('main', 'auto_stop', f'{self.auto_stop}')
@@ -420,12 +440,12 @@ class Nse:
     def toggle_updates(self, event: Optional[Event] = None) -> None:
         if self.update:
             self.update = False
-            self.options.entryconfig(self.options.index(6), label="Auto Check for Updates: Off")
+            self.options.entryconfig(self.options.index(7), label="Auto Check for Updates: Off")
             messagebox.showinfo(title="Auto Checking for Updates Disabled",
                                 message="Program will not check for updates at start.")
         else:
             self.update = True
-            self.options.entryconfig(self.options.index(6), label="Auto Check for Updates: On")
+            self.options.entryconfig(self.options.index(7), label="Auto Check for Updates: On")
             messagebox.showinfo(title="Auto Checking for Updates Enabled",
                                 message="Program will check for updates at start.")
 
@@ -449,7 +469,7 @@ class Nse:
                 print('.py version : ' + Nse.version)
 
             try:
-                self.options.entryconfig(self.options.index(7), label="Debug Logging: On")
+                self.options.entryconfig(self.options.index(8), label="Debug Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-OCA.log.")
             except AttributeError:
@@ -460,7 +480,7 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(7), label="Debug Logging: Off")
+            self.options.entryconfig(self.options.index(8), label="Debug Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
         self.config_parser.set('main', 'logging', f'{self.logging}')
@@ -572,6 +592,8 @@ class Nse:
         self.options.add_command(label="Export all to CSV", accelerator="(Ctrl+S)", command=self.export)
         self.options.add_command(label=f"Live Exporting to CSV: {'On' if self.live_export else 'Off'}",
                                  accelerator="(Ctrl+B)", command=self.toggle_live_export)
+        self.options.add_command(label=f"Dump Entire Option Chain to CSV: {'On' if self.save_oc else 'Off'}",
+                                 accelerator="(Ctrl+O)", command=self.toggle_save_oc)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
                                  accelerator="(Ctrl+N)", command=self.toggle_notifications)
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
@@ -589,6 +611,7 @@ class Nse:
         self.root.bind('<Control-x>', self.change_state)
         self.root.bind('<Control-s>', self.export)
         self.root.bind('<Control-b>', self.toggle_live_export)
+        self.root.bind('<Control-o>', self.toggle_save_oc)
         self.root.bind('<Control-n>', self.toggle_notifications)
         self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-u>', self.toggle_updates)
@@ -991,11 +1014,11 @@ class Nse:
             return
 
         try:
-            df: pandas.DataFrame
+            entire_oc: pandas.DataFrame
             current_time: str
             self.underlying_stock: str
             self.points: float
-            df, current_time, self.underlying_stock, self.points = self.get_dataframe()
+            entire_oc, current_time, self.underlying_stock, self.points = self.get_dataframe()
         except TypeError:
             self.root.after((self.seconds * 1000), self.main)
             return
@@ -1017,24 +1040,24 @@ class Nse:
                 return
 
         call_oi_list: List[int] = []
-        for i in range(len(df)):
-            int_call_oi: int = int(df.iloc[i, [0]][0])
+        for i in range(len(entire_oc)):
+            int_call_oi: int = int(entire_oc.iloc[i, [0]][0])
             call_oi_list.append(int_call_oi)
         call_oi_index: int = call_oi_list.index(max(call_oi_list))
         self.max_call_oi: float = round(max(call_oi_list) / 1000, 1)
-        self.max_call_oi_sp: numpy.float64 = df.iloc[call_oi_index]['Strike Price']
+        self.max_call_oi_sp: numpy.float64 = entire_oc.iloc[call_oi_index]['Strike Price']
 
         put_oi_list: List[int] = []
-        for i in range(len(df)):
-            int_put_oi: int = int(df.iloc[i, [20]][0])
+        for i in range(len(entire_oc)):
+            int_put_oi: int = int(entire_oc.iloc[i, [20]][0])
             put_oi_list.append(int_put_oi)
         put_oi_index: int = put_oi_list.index(max(put_oi_list))
         self.max_put_oi: float = round(max(put_oi_list) / 1000, 1)
-        self.max_put_oi_sp: numpy.float64 = df.iloc[put_oi_index]['Strike Price']
+        self.max_put_oi_sp: numpy.float64 = entire_oc.iloc[put_oi_index]['Strike Price']
 
         sp_range_list: List[numpy.float64] = []
         for i in range(put_oi_index, call_oi_index + 1):
-            sp_range_list.append(df.iloc[i]['Strike Price'])
+            sp_range_list.append(entire_oc.iloc[i]['Strike Price'])
 
         self.max_call_oi_2: float
         self.max_call_oi_sp_2: numpy.float64
@@ -1046,26 +1069,26 @@ class Nse:
             self.max_put_oi_2 = self.max_put_oi
             self.max_put_oi_sp_2 = self.max_put_oi_sp
         elif len(sp_range_list) == 2:
-            self.max_call_oi_2 = df[df['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]
+            self.max_call_oi_2 = entire_oc[entire_oc['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]
             self.max_call_oi_sp_2 = self.max_put_oi_sp
-            self.max_put_oi_2 = df[df['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]
+            self.max_put_oi_2 = entire_oc[entire_oc['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]
             self.max_put_oi_sp_2 = self.max_call_oi_sp
         else:
             call_oi_list_2: List[int] = []
             for i in range(put_oi_index, call_oi_index):
-                int_call_oi_2: int = int(df.iloc[i, [0]][0])
+                int_call_oi_2: int = int(entire_oc.iloc[i, [0]][0])
                 call_oi_list_2.append(int_call_oi_2)
             call_oi_index_2: int = put_oi_index + call_oi_list_2.index(max(call_oi_list_2))
             self.max_call_oi_2 = round(max(call_oi_list_2) / 1000, 1)
-            self.max_call_oi_sp_2 = df.iloc[call_oi_index_2]['Strike Price']
+            self.max_call_oi_sp_2 = entire_oc.iloc[call_oi_index_2]['Strike Price']
 
             put_oi_list_2: List[int] = []
             for i in range(put_oi_index + 1, call_oi_index + 1):
-                int_put_oi_2: int = int(df.iloc[i, [20]][0])
+                int_put_oi_2: int = int(entire_oc.iloc[i, [20]][0])
                 put_oi_list_2.append(int_put_oi_2)
             put_oi_index_2: int = put_oi_index + 1 + put_oi_list_2.index(max(put_oi_list_2))
             self.max_put_oi_2 = round(max(put_oi_list_2) / 1000, 1)
-            self.max_put_oi_sp_2 = df.iloc[put_oi_index_2]['Strike Price']
+            self.max_put_oi_sp_2 = entire_oc.iloc[put_oi_index_2]['Strike Price']
 
         total_call_oi: int = sum(call_oi_list)
         total_put_oi: int = sum(put_oi_list)
@@ -1076,7 +1099,7 @@ class Nse:
             self.put_call_ratio = 0
 
         try:
-            index: int = int(df[df['Strike Price'] == self.sp].index.tolist()[0])
+            index: int = int(entire_oc[entire_oc['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
             print(err, "10")
             messagebox.showerror(title="Error",
@@ -1084,12 +1107,12 @@ class Nse:
             self.root.destroy()
             return
 
-        a: pandas.DataFrame = df[['Change in Open Interest']][df['Strike Price'] == self.sp]
+        a: pandas.DataFrame = entire_oc[['Change in Open Interest']][entire_oc['Strike Price'] == self.sp]
         b1: pandas.Series = a.iloc[:, 0]
         c1: numpy.int64 = b1.get(index)
-        b2: pandas.Series = df.iloc[:, 1]
+        b2: pandas.Series = entire_oc.iloc[:, 1]
         c2: numpy.int64 = b2.get((index + 1), 'Change in Open Interest')
-        b3: pandas.Series = df.iloc[:, 1]
+        b3: pandas.Series = entire_oc.iloc[:, 1]
         c3: numpy.int64 = b3.get((index + 2), 'Change in Open Interest')
         if isinstance(c2, str):
             c2 = 0
@@ -1102,11 +1125,11 @@ class Nse:
 
         o1: pandas.Series = a.iloc[:, 1]
         p1: numpy.int64 = o1.get(index)
-        o2: pandas.Series = df.iloc[:, 19]
+        o2: pandas.Series = entire_oc.iloc[:, 19]
         p2: numpy.int64 = o2.get((index + 1), 'Change in Open Interest')
         p3: numpy.int64 = o2.get((index + 2), 'Change in Open Interest')
         self.p4: numpy.int64 = o2.get((index + 4), 'Change in Open Interest')
-        o3: pandas.Series = df.iloc[:, 1]
+        o3: pandas.Series = entire_oc.iloc[:, 1]
         self.p5: numpy.int64 = o3.get((index + 4), 'Change in Open Interest')
         self.p6: numpy.int64 = o3.get((index - 2), 'Change in Open Interest')
         self.p7: numpy.int64 = o2.get((index - 2), 'Change in Open Interest')
@@ -1144,6 +1167,15 @@ class Nse:
             return
 
         self.set_values()
+
+        if self.save_oc:
+            try:
+                entire_oc.to_csv(f"NSE-OCA-{self.index}-{self.expiry_date}-Full.csv", index=False)
+            except PermissionError as err:
+                print(err, "11")
+                messagebox.showerror(title="Export Failed",
+                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}-Full.csv.\n"
+                                             f"Permission Denied. Try closing any apps using it.")
 
         if self.first_run:
             if self.update:
