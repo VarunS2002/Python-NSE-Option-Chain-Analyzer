@@ -35,6 +35,12 @@ class Nse:
         self.log() if self.logging else None
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+        self.output_columns: Tuple[str, str, str, str, str, str, str, str, str] = (
+            'Time', 'Value', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
+            'Put Boundary\n(in K)', 'Call ITM', 'Put ITM')
+        self.csv_headers: Tuple[str, str, str, str, str, str, str, str, str] = (
+            'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
+            'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM')
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) '
@@ -335,9 +341,7 @@ class Nse:
             if not csv_exists:
                 with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
                     data_writer: csv.writer = csv.writer(row)
-                    data_writer.writerow((
-                        'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
-                        'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
+                    data_writer.writerow(self.csv_headers)
 
             with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
                 data_writer: csv.writer = csv.writer(row)
@@ -357,9 +361,7 @@ class Nse:
                 if not csv_exists:
                     with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
                         data_writer: csv.writer = csv.writer(row)
-                        data_writer.writerow((
-                            'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
-                            'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM'))
+                        data_writer.writerow(self.csv_headers)
             except Exception as err:
                 print(err, "9")
         else:
@@ -625,12 +627,9 @@ class Nse:
         top_frame.columnconfigure(0, weight=1)
         top_frame.pack(fill="both", expand=True)
 
-        output_columns: Tuple[str, str, str, str, str, str, str, str, str] = (
-            'Time', 'Value', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
-            'Put Boundary\n(in K)', 'Call ITM', 'Put ITM')
-        self.sheet: tksheet.Sheet = tksheet.Sheet(top_frame, column_width=85, align="center", headers=output_columns,
-                                                  header_font=("TkDefaultFont", 9, "bold"), empty_horizontal=0,
-                                                  empty_vertical=20, header_height=35)
+        self.sheet: tksheet.Sheet = tksheet.Sheet(top_frame, column_width=85, align="center",
+                                                  headers=self.output_columns, header_font=("TkDefaultFont", 9, "bold"),
+                                                  empty_horizontal=0, empty_vertical=20, header_height=35)
         self.sheet.enable_bindings(
             ("toggle_select", "drag_select", "column_select", "row_select", "column_width_resize",
              "arrowkeys", "right_click_popup_menu", "rc_select", "copy", "select_all"))
