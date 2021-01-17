@@ -1,12 +1,13 @@
 # CHANGELOG
 
-<br><br>
+<br>
+
 ># [4.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/4.0)
 ## Major Feature Update
-- Added Support FINNIFTY index
+- Added support for FINNIFTY index
 - Dropped support for NIFTYIT index
 - Added Live Exporting of Data rows to a .csv file
-  - Live Exporting is disabled by default (Enable from Option menu or Ctrl + B)
+  - Live Exporting is disabled by default (Enable from Option menu or Ctrl+B)
 - Supports exporting data while running multiple instances with different indices and/or expiry dates selected
   - Filename contains the selected index and expiry date. For eg. NSE-OCA-NIFTY-14-Jan-2021.csv will only have the data for NIFTY and 14 Jan 21 regardless of the instance running
 - Adds Column Names to the .csv file if it is created for the first time
@@ -27,7 +28,7 @@
     * Debug Logging
   - Settings are saved to NSE-OCA.ini
   - Resets NSE-OCA.ini file if incorrectly configured
-- Fixed issue where Points would be 0 for some strike prices. Issue: https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/6
+- Fixed issue where Points would be 0 for some strike prices. Issue: [#6](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/6)
 - Added NSE icon to all windows (if icon file is missing, default icon will be used)
 - Improved Option Menu
 - Improved messages in Alert boxes
@@ -47,7 +48,8 @@
   - Changed name of the log file from nse.log to NSE-OCA.log
 - Many Code Improvements
 
-<br><br><br>
+<br>
+
 ># [3.7](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.7)
 ## Feature Update
 - Added 2nd Highest Call and Put Open Interest and their corresponding Strike Price
@@ -60,19 +62,22 @@
 - Ceased releasing Python Compiled Files (.pyc/.pyw)
   - Since it runs only on specific versions of Python
 
-<br><br><br>
+<br>
+
 ># [3.5](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.5)
 ## Bug Fix Update
 - Fixed an issue when program would stop refreshing after a few hours (creates a new session everytime)
 
-<br><br><br>
+<br>
+
 ># [3.4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.4)
 ## Bug Fix Update
 - Fixed an issue when program would stop refreshing after every ~2 hours (creates a new session everytime)
 - Fixed an issue when the program would stop refreshing after one connection error
 - Added Debug Logging (Use this to report any issues)
 
-<br><br><br>
+<br>
+
 ># [3.3](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.3)
 ## Bug Fix Update
 - Now uses sessions and cookies to access the website to solve many connection errors
@@ -81,7 +86,8 @@
 - Refactored code
 - Drastically reduced .exe size (~98MB to ~35MB)
 
-<br><br><br>
+<br>
+
 ># [3.2](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.2)
 ## Bug Fix Update
 - Fixed an issue when the program would stop responding if the internet connection is poor
@@ -90,7 +96,8 @@
 - Added units in column labels
 - Slightly reduced the width of the program's main window
 
-<br><br><br>
+<br>
+
 ># [3.1](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.1)
 ## Bug Fix and .exe Update
 - Fixed error when the entered strike price is towards the upper limit or the lower limit of the table
@@ -98,7 +105,8 @@
 - Used to auto-py-to-exe to compile the program to a .exe file (beta)
 - README.md updated
 
-<br><br><br>
+<br>
+
 ># [3.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/3.0)
 ## Major Compatibility Update
 - Now compatible with the new NSE website
@@ -115,7 +123,8 @@
 - Miscellaneous bug fixes
 - Since the new website disallows and is made for preventing web scraping, you may encounter more connection errors
 
-<br><br><br>
+<br>
+
 ># [2.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/2.0)
 ## Major Feature Update
 - Added GUI
@@ -125,7 +134,8 @@
 - Added About window with version and links for developer GitHub profile, README, license, releases and sources
 - Instructions about the data is included in README.md
 
-<br><br><br>
+<br>
+
 ># [1.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/1.0)
 ## First Release
 - Enter the final URL from the browser and your preferred Strike Price
