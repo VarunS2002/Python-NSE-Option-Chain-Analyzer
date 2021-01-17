@@ -787,7 +787,8 @@ class Nse:
         return merged_inner, current_time, underlying_stock, points
 
     def set_values(self) -> None:
-        self.root.title(f"NSE-Option-Chain-Analyzer - {self.underlying_stock} - {self.expiry_date} - {self.sp}")
+        if self.first_run:
+            self.root.title(f"NSE-Option-Chain-Analyzer - {self.underlying_stock} - {self.expiry_date} - {self.sp}")
 
         self.max_call_oi_val.config(text=self.max_call_oi)
         self.max_call_oi_sp_val.config(text=self.max_call_oi_sp)
