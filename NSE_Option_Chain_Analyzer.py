@@ -790,6 +790,11 @@ class Nse:
         if self.first_run:
             self.root.title(f"NSE-Option-Chain-Analyzer - {self.underlying_stock} - {self.expiry_date} - {self.sp}")
 
+        self.old_max_call_oi_sp: numpy.float64
+        self.old_max_call_oi_sp_2: numpy.float64
+        self.old_max_put_oi_sp: numpy.float64
+        self.old_max_put_oi_sp_2: numpy.float64
+
         self.max_call_oi_val.config(text=self.max_call_oi)
         self.max_call_oi_sp_val.config(text=self.max_call_oi_sp)
         self.max_call_oi_2_val.config(text=self.max_call_oi_2)
@@ -798,6 +803,42 @@ class Nse:
         self.max_put_oi_sp_val.config(text=self.max_put_oi_sp)
         self.max_put_oi_2_val.config(text=self.max_put_oi_2)
         self.max_put_oi_sp_2_val.config(text=self.max_put_oi_sp_2)
+
+        if self.first_run or self.old_max_call_oi_sp == self.max_call_oi_sp:
+            self.old_max_call_oi_sp = self.max_call_oi_sp
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Upper Boundary Strike Price changed",
+                                        f"Changed from {self.old_max_call_oi_sp} to {self.max_call_oi_sp}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_max_call_oi_sp = self.max_call_oi_sp
+
+        if self.first_run or self.old_max_call_oi_sp_2 == self.max_call_oi_sp_2:
+            self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Upper Boundary Strike Price 2 changed",
+                                        f"Changed from {self.old_max_call_oi_sp_2} to {self.max_call_oi_sp_2}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
+
+        if self.first_run or self.old_max_put_oi_sp == self.max_put_oi_sp:
+            self.old_max_put_oi_sp = self.max_put_oi_sp
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Lower Boundary Strike Price changed",
+                                        f"Changed from {self.old_max_put_oi_sp} to {self.max_put_oi_sp}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_max_put_oi_sp = self.max_put_oi_sp
+
+        if self.first_run or self.old_max_put_oi_sp_2 == self.max_put_oi_sp_2:
+            self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
+        else:
+            if self.notifications:
+                self.toaster.show_toast("Lower Boundary Strike Price 2 changed",
+                                        f"Changed from {self.old_max_put_oi_sp_2} to {self.max_put_oi_sp_2}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
+            self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
 
         red: str = "#e53935"
         green: str = "#00e676"
