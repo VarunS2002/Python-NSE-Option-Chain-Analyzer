@@ -349,6 +349,11 @@ class Nse:
 
             messagebox.showinfo(title="Export Successful",
                                 message=f"Data has been exported to NSE-OCA-{self.index}-{self.expiry_date}.csv.")
+        except PermissionError as err:
+            print(err, "12")
+            messagebox.showerror(title="Export Failed",
+                                 message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                         f"Permission Denied. Try closing any apps using it.")
         except Exception as err:
             print(err, "8")
             messagebox.showerror(title="Export Failed",
@@ -362,12 +367,25 @@ class Nse:
                     with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
                         data_writer: csv.writer = csv.writer(row)
                         data_writer.writerow(self.csv_headers)
+            except PermissionError as err:
+                print(err, "13")
+                messagebox.showerror(title="Export Failed",
+                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                             f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
                 print(err, "9")
         else:
-            with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
-                data_writer: csv.writer = csv.writer(row)
-                data_writer.writerow(values)
+            try:
+                with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                    data_writer: csv.writer = csv.writer(row)
+                    data_writer.writerow(values)
+            except PermissionError as err:
+                print(err, "14")
+                messagebox.showerror(title="Export Failed",
+                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                             f"Permission Denied. Try closing any apps using it.")
+            except Exception as err:
+                print(err, "15")
 
     # noinspection PyUnusedLocal
     def toggle_live_export(self, event: Optional[Event] = None) -> None:
@@ -1218,6 +1236,8 @@ class Nse:
                 messagebox.showerror(title="Export Failed",
                                      message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}-Full.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
+            except Exception as err:
+                print(err, "16")
 
         if self.first_run:
             if self.update:
