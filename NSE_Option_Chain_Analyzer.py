@@ -3,6 +3,7 @@ import csv
 import datetime
 import os
 import sys
+import time
 import webbrowser
 from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
     Label, Entry, SOLID, RIDGE, N, S, E, W, LEFT, messagebox
@@ -1243,7 +1244,9 @@ class Nse:
             if self.update:
                 self.check_for_updates()
             self.first_run = False
-        if self.str_current_time == '15:30:00' and not self.stop and self.auto_stop:
+        if self.str_current_time == '15:30:00' and not self.stop and self.auto_stop \
+                and self.previous_date == datetime.datetime.strptime(time.strftime("%d-%b-%Y", time.localtime()),
+                                                                     "%d-%b-%Y").date():
             self.stop = True
             self.options.entryconfig(self.options.index(0), label="Start")
             messagebox.showinfo(title="Market Closed", message="Retrieving new data has been stopped.")
