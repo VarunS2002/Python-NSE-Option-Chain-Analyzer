@@ -2,6 +2,22 @@
 
 <br>
 
+># [4.1](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/4.1)
+## Feature Update
+- Added Dumping Entire Option Chain data to a .csv file. Issues: [#3](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/3) and [#4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/4)
+  - Dump Entire Option Chain is disabled by default (Enable from Option menu or Ctrl+O)
+  - Saves this setting for subsequent runs
+- Added Notifications for changes in value of OI Upper and Lower Boundary Strike Prices
+- Renamed 'Export all to CSV' option to 'Export Table to CSV'
+- Fixed Call and Put OI for 2nd Strike Price not being displayed in K when the Strike Prices were consecutive
+- Fixed issues where export would fail and program would stop if the .csv file is open in some other program or is inaccessible
+- Fixed issue where program stops immediately if you start it before market opens when you have auto stop enabled
+- Prevents crash during Checking for updates due to poor internet connection
+- Fixed 'Quitting Program' being logged even if Debug Logging was off
+- Fixed possible issues while reading configuration
+
+<br>
+
 ># [4.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/4.0)
 ## Major Feature Update
 - Added support for FINNIFTY index

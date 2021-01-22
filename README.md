@@ -1,7 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![Latest: v4.0](https://img.shields.io/badge/release-v4.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/4.0/NSE_Option_Chain_Analyzer_4.0.exe)
+[![Latest: v4.1](https://img.shields.io/badge/release-v4.1-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/4.1/NSE_Option_Chain_Analyzer_4.1.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -64,7 +64,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
 
-- [numpy](https://pypi.org/project/numpy/) is used for calculations
+- [numpy](https://pypi.org/project/numpy/) is used for data types
 
 - [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
 
@@ -91,11 +91,18 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - Red and Green colour indication for data based on trends
 
-- Toast Notifications for notifying when trend changes
+- Toast Notifications for notifying when trend changes. Notified changes:
+     * Open Interest: Bullish/Bearish
+     * Open Interest Upper Boundary Strike Prices: Change in Value
+     * Open Interest Lower Boundary Strike Prices: Change in Value
+     * Call Exits: Yes/No
+     * Put Exits: Yes/No
+     * Call ITM: Yes/No
+     * Put ITM: Yes/No
 
 - Program title format: `NSE-Option-Chain-Analyzer - {index} - {expiry_date} - {strike_price}`
 
-- Stop and Start functionality
+- Stop and Start manually
 
 - You can select all table data using Ctrl+A or select individual cells, rows and columns 
 
@@ -103,9 +110,11 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - You can then paste it in any spreadsheet application (Tested with MS Excel and Google Sheets)
 
-- Export all data to .csv file 
+- Export table data to .csv file
 
 - Real time exporting data rows to .csv file
+
+- Dumping entire Option Chain data to a .csv file
 
 - Auto stop the program at 3:30pm when the market closes
 
@@ -118,6 +127,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
      * Refresh Interval
      * Live Export
      * Notifications
+     * Dump entire Option Chain
      * Auto stop at 3:30pm
      * Auto Check for Updates
      * Debug Logging
@@ -170,4 +180,4 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 - Option Menu
 
-  <br>![Option_Menu](https://i.imgur.com/POiN0Cr.png)
+  <br>![Option_Menu](https://i.imgur.com/jtrjCvY.png)
