@@ -602,7 +602,7 @@ class Nse:
         window_height: int = self.root.winfo_reqheight()
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
-        self.root.geometry("830x560+{}+{}".format(position_right, position_down))
+        self.root.geometry("815x560+{}+{}".format(position_right, position_down))
         if self.icon_path:
             self.root.iconbitmap(self.icon_path)
         self.root.rowconfigure(0, weight=1)
