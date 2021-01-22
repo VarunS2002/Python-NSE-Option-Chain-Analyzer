@@ -1130,9 +1130,11 @@ class Nse:
             self.max_put_oi_2 = self.max_put_oi
             self.max_put_oi_sp_2 = self.max_put_oi_sp
         elif len(sp_range_list) == 2:
-            self.max_call_oi_2 = entire_oc[entire_oc['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]
+            self.max_call_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]) / 1000,
+                                       1)
             self.max_call_oi_sp_2 = self.max_put_oi_sp
-            self.max_put_oi_2 = entire_oc[entire_oc['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]
+            self.max_put_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]) / 1000,
+                                      1)
             self.max_put_oi_sp_2 = self.max_call_oi_sp
         else:
             call_oi_list_2: List[int] = []
