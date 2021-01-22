@@ -3,7 +3,7 @@
 <br>
 
 ># [4.1](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/4.1)
-## Feature Update
+## Feature and Bug Fix Update
 - Added Dumping Entire Option Chain data to a .csv file. Issues: [#3](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/3) and [#4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/4)
   - Dump Entire Option Chain is disabled by default (Enable from Option menu or Ctrl+O)
   - Saves this setting for subsequent runs
