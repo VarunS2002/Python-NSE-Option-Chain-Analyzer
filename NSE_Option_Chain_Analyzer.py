@@ -864,7 +864,7 @@ class Nse:
 
         self.root.mainloop()
 
-    def get_dataframe(self) -> Optional[Tuple[pandas.DataFrame, str, str, float]]:
+    def get_dataframe(self) -> Optional[Tuple[pandas.DataFrame, str, float]]:
         try:
             response: Optional[requests.Response]
             json_data: Any
@@ -885,7 +885,6 @@ class Nse:
                                  "CE" in data and str(data['expiryDate'].lower() == str(self.expiry_date).lower())]
         pe_values: List[dict] = [data['PE'] for data in json_data['records']['data'] if
                                  "PE" in data and str(data['expiryDate'].lower() == str(self.expiry_date).lower())]
-        underlying_stock: str = ce_values[0]['underlying']
         points: float = pe_values[0]['underlyingValue']
         if points == 0:
             for item in pe_values:
@@ -916,11 +915,12 @@ class Nse:
                                 'Ask Quantity', 'Net Change', 'Last Traded Price', 'Implied Volatility',
                                 'Traded Volume', 'Change in Open Interest', 'Open Interest']
         current_time: str = df['timestamp']['records']
-        return merged_inner, current_time, underlying_stock, points
+        return merged_inner, current_time, points
 
     def set_values(self) -> None:
         if self.first_run:
-            self.root.title(f"NSE-Option-Chain-Analyzer - {self.underlying_stock} - {self.expiry_date} - {self.sp}")
+            self.root.title(f"NSE-Option-Chain-Analyzer - {self.index if self.option_mode == 'Index' else self.stock} "
+                            f"- {self.expiry_date} - {self.sp}")
 
         self.old_max_call_oi_sp: numpy.float64
         self.old_max_call_oi_sp_2: numpy.float64
@@ -1190,9 +1190,8 @@ class Nse:
         try:
             entire_oc: pandas.DataFrame
             current_time: str
-            self.underlying_stock: str
             self.points: float
-            entire_oc, current_time, self.underlying_stock, self.points = self.get_dataframe()
+            entire_oc, current_time, self.points = self.get_dataframe()
         except TypeError:
             self.root.after((self.seconds * 1000), self.main)
             return
