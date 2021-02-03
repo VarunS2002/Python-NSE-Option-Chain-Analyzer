@@ -5,8 +5,8 @@ import os
 import sys
 import time
 import webbrowser
-from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, \
-    Label, Entry, SOLID, RIDGE, N, S, E, W, LEFT, messagebox
+from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, Label, Entry, SOLID, RIDGE, \
+    DISABLED, NORMAL, N, S, E, W, LEFT, messagebox
 from tkinter.ttk import Combobox, Button
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
 
@@ -30,24 +30,59 @@ class Nse:
         self.previous_time: Optional[datetime.time] = None
         self.first_run: bool = True
         self.stop: bool = False
+        self.dates: List[str] = [""]
+        self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+        # noinspection SpellCheckingInspection
+        self.stocks: List[str] = ['AARTIIND', 'ACC', 'ADANIENT', 'ADANIPORTS', 'AMARAJABAT', 'AMBUJACEM', 'APOLLOHOSP',
+                                  'APOLLOTYRE', 'ASHOKLEY',
+                                  'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJAJFINSV', 'BAJFINANCE',
+                                  'BALKRISIND', 'BANDHANBNK',
+                                  'BANKBARODA', 'BATAINDIA', 'BEL', 'BERGEPAINT', 'BHARATFORG', 'BHARTIARTL', 'BHEL',
+                                  'BIOCON', 'BOSCHLTD',
+                                  'BPCL', 'BRITANNIA', 'CADILAHC', 'CANBK', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE',
+                                  'COLPAL', 'CONCOR',
+                                  'CUMMINSIND', 'DABUR', 'DIVISLAB', 'DLF', 'DRREDDY', 'EICHERMOT', 'ESCORTS',
+                                  'EXIDEIND', 'FEDERALBNK', 'GAIL',
+                                  'GLENMARK', 'GMRINFRA', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS', 'HCLTECH',
+                                  'HDFC', 'HDFCAMC', 'HDFCBANK',
+                                  'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO', 'HINDUNILVR', 'IBULHSGFIN',
+                                  'ICICIBANK', 'ICICIGI',
+                                  'ICICIPRULI', 'IDEA', 'IDFCFIRSTB', 'IGL', 'INDIGO', 'INDUSINDBK', 'INDUSTOWER',
+                                  'INFRATEL', 'INFY', 'IOC',
+                                  'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'L&TFH', 'LALPATHLAB',
+                                  'LICHSGFIN', 'LT', 'LUPIN',
+                                  'M&M', 'M&MFIN', 'MANAPPURAM', 'MARICO', 'MARUTI', 'MCDOWELL-N', 'MFSL', 'MGL',
+                                  'MINDTREE', 'MOTHERSUMI', 'MRF',
+                                  'MUTHOOTFIN', 'NATIONALUM', 'NAUKRI', 'NESTLEIND', 'NMDC', 'NTPC', 'ONGC', 'PAGEIND',
+                                  'PEL', 'PETRONET', 'PFC',
+                                  'PIDILITIND', 'PNB', 'POWERGRID', 'PVR', 'RAMCOCEM', 'RBLBANK', 'RECLTD', 'RELIANCE',
+                                  'SAIL', 'SBILIFE', 'SBIN',
+                                  'SHREECEM', 'SIEMENS', 'SRF', 'SRTRANSFIN', 'SUNPHARMA', 'SUNTV', 'TATACHEM',
+                                  'TATACONSUM', 'TATAMOTORS',
+                                  'TATAPOWER', 'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TORNTPHARM', 'TORNTPOWER',
+                                  'TVSMOTOR', 'UBL', 'ULTRACEMCO',
+                                  'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL']
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.create_config() if not os.path.isfile('NSE-OCA.ini') else None
         self.get_config()
         self.log() if self.logging else None
-        self.dates: List[str] = [""]
-        self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+        self.units_str: str = 'in K' if self.option_mode == 'Index' else 'in 10s'
         self.output_columns: Tuple[str, str, str, str, str, str, str, str, str] = (
-            'Time', 'Value', 'Call Sum\n(in K)', 'Put Sum\n(in K)', 'Difference\n(in K)', 'Call Boundary\n(in K)',
-            'Put Boundary\n(in K)', 'Call ITM', 'Put ITM')
+            'Time', 'Value', f'Call Sum\n({self.units_str})', f'Put Sum\n({self.units_str})',
+            f'Difference\n({self.units_str})', f'Call Boundary\n({self.units_str})',
+            f'Put Boundary\n({self.units_str})', 'Call ITM', 'Put ITM')
         self.csv_headers: Tuple[str, str, str, str, str, str, str, str, str] = (
-            'Time', 'Value', 'Call Sum (in K)', 'Put Sum (in K)', 'Difference (in K)',
-            'Call Boundary (in K)', 'Put Boundary (in K)', 'Call ITM', 'Put ITM')
+            'Time', 'Value', f'Call Sum ({self.units_str})', f'Put Sum ({self.units_str})',
+            f'Difference ({self.units_str})',
+            f'Call Boundary ({self.units_str})', f'Put Boundary ({self.units_str})', 'Call ITM', 'Put ITM')
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) '
                           'Chrome/80.0.3987.149 Safari/537.36',
             'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
         self.url_oc: str = "https://www.nseindia.com/option-chain"
+        self.url_index: str = "https://www.nseindia.com/api/option-chain-indices?symbol="
+        self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
         self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier()
@@ -97,7 +132,9 @@ class Nse:
 
         self.config_parser.read('NSE-OCA.ini')
         self.config_parser.add_section('main')
-        self.config_parser.set('main', 'index', 'NIFTY')
+        self.config_parser.set('main', 'index', self.indices[0])
+        self.config_parser.set('main', 'stock', self.stocks[0])
+        self.config_parser.set('main', 'option_mode', 'Index')
         self.config_parser.set('main', 'seconds', '60')
         self.config_parser.set('main', 'live_export', 'False')
         self.config_parser.set('main', 'save_oc', 'False')
@@ -113,6 +150,8 @@ class Nse:
         try:
             self.config_parser.read('NSE-OCA.ini')
             self.index: str = self.config_parser.get('main', 'index')
+            self.stock: str = self.config_parser.get('main', 'stock')
+            self.option_mode: str = self.config_parser.get('main', 'option_mode')
             self.seconds: int = self.config_parser.getint('main', 'seconds')
             self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
@@ -120,6 +159,12 @@ class Nse:
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             self.update: bool = self.config_parser.getboolean('main', 'update')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
+            if self.index not in self.indices:
+                raise ValueError(f'{self.index} is not a valid index')
+            if self.stock not in self.stocks:
+                raise ValueError(f'{self.stock} is not a valid stock')
+            if self.option_mode not in ('Index', 'Stock'):
+                raise ValueError(f'{self.option_mode} is not a valid option mode')
         except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
                 configparser.DuplicateSectionError, configparser.DuplicateOptionError, ValueError) as err:
             print(err, "0")
@@ -136,12 +181,27 @@ class Nse:
     def get_data_first_run(self) -> Optional[Tuple[Optional[requests.Response], Any]]:
         request: Optional[requests.Response] = None
         response: Optional[requests.Response] = None
-        self.index = self.index_var.get()
-        self.config_parser.set('main', 'index', f'{self.index}')
+        self.units_str = 'in K' if self.option_mode == 'Index' else 'in 10s'
+        self.output_columns: Tuple[str, str, str, str, str, str, str, str, str] = (
+            'Time', 'Value', f'Call Sum\n({self.units_str})', f'Put Sum\n({self.units_str})',
+            f'Difference\n({self.units_str})', f'Call Boundary\n({self.units_str})',
+            f'Put Boundary\n({self.units_str})', 'Call ITM', 'Put ITM')
+        self.csv_headers: Tuple[str, str, str, str, str, str, str, str, str] = (
+            'Time', 'Value', f'Call Sum ({self.units_str})', f'Put Sum ({self.units_str})',
+            f'Difference ({self.units_str})',
+            f'Call Boundary ({self.units_str})', f'Put Boundary ({self.units_str})', 'Call ITM', 'Put ITM')
+        self.round_factor: int = 1000 if self.option_mode == 'Index' else 10
+        if self.option_mode == 'Index':
+            self.index = self.index_var.get()
+            self.config_parser.set('main', 'index', f'{self.index}')
+        else:
+            self.stock = self.stock_var.get()
+            self.config_parser.set('main', 'stock', f'{self.stock}')
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
+
+        url: str = self.url_index + self.index if self.option_mode == 'Index' else self.url_stock + self.stock
         try:
-            url: str = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
             request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
             self.cookies = dict(request.cookies)
             response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
@@ -189,13 +249,12 @@ class Nse:
     def get_data_refresh(self) -> Optional[Tuple[Optional[requests.Response], Any]]:
         request: Optional[requests.Response] = None
         response: Optional[requests.Response] = None
+        url: str = self.url_index + self.index if self.option_mode == 'Index' else self.url_stock + self.stock
         try:
-            url: str = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
             response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
             if response.status_code == 401:
                 self.session.close()
                 self.session = requests.Session()
-                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
                 request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
                 self.cookies = dict(request.cookies)
                 response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
@@ -207,7 +266,6 @@ class Nse:
             try:
                 self.session.close()
                 self.session = requests.Session()
-                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={self.index}"
                 request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
                 self.cookies = dict(request.cookies)
                 response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
@@ -238,13 +296,16 @@ class Nse:
         window_height: int = self.login.winfo_reqheight()
         position_right: int = int(self.login.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
-        self.login.geometry("320x110+{}+{}".format(position_right, position_down))
+        self.login.geometry("320x160+{}+{}".format(position_right, position_down))
+        self.login.resizable(False, False)
         if self.icon_path:
             self.login.iconbitmap(self.icon_path)
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
         self.login.rowconfigure(3, weight=1)
+        self.login.rowconfigure(4, weight=1)
+        self.login.rowconfigure(5, weight=1)
         self.login.columnconfigure(0, weight=1)
         self.login.columnconfigure(1, weight=1)
         self.login.columnconfigure(2, weight=1)
@@ -253,34 +314,47 @@ class Nse:
         self.intervals_var.set(self.intervals[0])
         self.index_var: StringVar = StringVar()
         self.index_var.set(self.indices[0])
+        self.stock_var: StringVar = StringVar()
+        self.stock_var.set(self.stocks[0])
         self.dates_var: StringVar = StringVar()
         self.dates_var.set(self.dates[0])
 
+        option_mode_label: Label = Label(self.login, text="Mode: ", justify=LEFT)
+        option_mode_label.grid(row=0, column=0, sticky=N + S + W)
+        self.option_mode_btn: Button = Button(self.login, text=f"{'Index' if self.option_mode == 'Index' else 'Stock'}",
+                                              command=self.change_option_mode, width=10)
+        self.option_mode_btn.grid(row=0, column=1, sticky=N + S + E + W)
         index_label: Label = Label(self.login, text="Index: ", justify=LEFT)
-        index_label.grid(row=0, column=0, sticky=N + S + W)
+        index_label.grid(row=1, column=0, sticky=N + S + W)
         self.index_menu: Combobox = Combobox(self.login, textvariable=self.index_var, values=self.indices)
-        self.index_menu.config(width=15)
-        self.index_menu.grid(row=0, column=1, sticky=N + S + E)
+        self.index_menu.config(width=15, state=NORMAL if self.option_mode == 'Index' else DISABLED)
+        self.index_menu.grid(row=1, column=1, sticky=N + S + E)
         self.index_menu.current(self.indices.index(self.index))
+        stock_label: Label = Label(self.login, text="Stock: ", justify=LEFT)
+        stock_label.grid(row=2, column=0, sticky=N + S + W)
+        self.stock_menu: Combobox = Combobox(self.login, textvariable=self.stock_var, values=self.stocks)
+        self.stock_menu.config(width=15, state=NORMAL if self.option_mode == 'Stock' else DISABLED)
+        self.stock_menu.grid(row=2, column=1, sticky=N + S + E)
+        self.stock_menu.current(self.stocks.index(self.stock))
         date_label: Label = Label(self.login, text="Expiry Date: ", justify=LEFT)
-        date_label.grid(row=1, column=0, sticky=N + S + W)
+        date_label.grid(row=3, column=0, sticky=N + S + W)
         self.date_menu: Combobox = Combobox(self.login, textvariable=self.dates_var)
         self.date_menu.config(width=15)
-        self.date_menu.grid(row=1, column=1, sticky=N + S + E)
+        self.date_menu.grid(row=3, column=1, sticky=N + S + E)
         self.date_get: Button = Button(self.login, text="Refresh", command=self.get_data, width=10)
-        self.date_get.grid(row=1, column=2, sticky=N + S + E + W)
+        self.date_get.grid(row=3, column=2, sticky=N + S + E + W)
         sp_label: Label = Label(self.login, text="Strike Price (eg. 14750): ")
-        sp_label.grid(row=2, column=0, sticky=N + S + W)
+        sp_label.grid(row=4, column=0, sticky=N + S + W)
         self.sp_entry = Entry(self.login, width=18, relief=SOLID)
-        self.sp_entry.grid(row=2, column=1, sticky=N + S + E)
+        self.sp_entry.grid(row=4, column=1, sticky=N + S + E)
         start_btn: Button = Button(self.login, text="Start", command=self.start, width=10)
-        start_btn.grid(row=2, column=2, rowspan=2, sticky=N + S + E + W)
+        start_btn.grid(row=4, column=2, rowspan=2, sticky=N + S + E + W)
         intervals_label: Label = Label(self.login, text="Refresh Interval (in min): ", justify=LEFT)
-        intervals_label.grid(row=3, column=0, sticky=N + S + W)
+        intervals_label.grid(row=5, column=0, sticky=N + S + W)
         self.intervals_menu: Combobox = Combobox(self.login, textvariable=self.intervals_var,
                                                  values=tuple(self.intervals))
         self.intervals_menu.config(width=15)
-        self.intervals_menu.grid(row=3, column=1, sticky=N + S + E)
+        self.intervals_menu.grid(row=5, column=1, sticky=N + S + E)
         self.intervals_menu.current(self.intervals.index(int(self.seconds / 60)))
         self.sp_entry.focus_set()
         self.get_data()
@@ -295,10 +369,30 @@ class Nse:
 
         self.index_menu.bind('<Return>', lambda event, a=1: focus_widget(event, a))
         self.index_menu.bind("<<ComboboxSelected>>", self.get_data)
+        self.stock_menu.bind('<Return>', lambda event, a=1: focus_widget(event, a))
+        self.stock_menu.bind("<<ComboboxSelected>>", self.get_data)
         self.date_menu.bind('<Return>', lambda event, a=2: focus_widget(event, a))
         self.sp_entry.bind('<Return>', self.start)
 
         self.login.mainloop()
+
+    def change_option_mode(self) -> None:
+        if self.option_mode_btn['text'] == 'Index':
+            self.option_mode = 'Stock'
+            self.option_mode_btn.config(text='Stock')
+            self.index_menu.config(state=DISABLED)
+            self.stock_menu.config(state=NORMAL)
+        else:
+            self.option_mode = 'Index'
+            self.option_mode_btn.config(text='Index')
+            self.index_menu.config(state=NORMAL)
+            self.stock_menu.config(state=DISABLED)
+
+        self.get_data()
+
+        self.config_parser.set('main', 'option_mode', f'{self.option_mode}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
     def start(self, event: Optional[Event] = None) -> None:
@@ -337,23 +431,30 @@ class Nse:
     # noinspection PyUnusedLocal
     def export(self, event: Optional[Event] = None) -> None:
         sheet_data: List[List[str]] = self.sheet.get_sheet_data()
-        csv_exists: bool = os.path.isfile(f"NSE-OCA-{self.index}-{self.expiry_date}.csv")
+        csv_exists: bool = os.path.isfile(
+            f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv")
         try:
             if not csv_exists:
-                with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                with open(f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv",
+                          "a", newline="") as row:
                     data_writer: csv.writer = csv.writer(row)
                     data_writer.writerow(self.csv_headers)
 
-            with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+            with open(f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv",
+                      "a", newline="") as row:
                 data_writer: csv.writer = csv.writer(row)
                 data_writer.writerows(sheet_data)
 
             messagebox.showinfo(title="Export Successful",
-                                message=f"Data has been exported to NSE-OCA-{self.index}-{self.expiry_date}.csv.")
+                                message=f"Data has been exported to NSE-OCA-"
+                                        f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                        f"{self.expiry_date}.csv.")
         except PermissionError as err:
             print(err, "12")
             messagebox.showerror(title="Export Failed",
-                                 message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                 message=f"Failed to access NSE-OCA-"
+                                         f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                         f"{self.expiry_date}.csv.\n"
                                          f"Permission Denied. Try closing any apps using it.")
         except Exception as err:
             print(err, "8")
@@ -362,28 +463,37 @@ class Nse:
 
     def export_row(self, values: Optional[List[Union[str, float, numpy.float64]]]) -> None:
         if values is None:
-            csv_exists: bool = os.path.isfile(f"NSE-OCA-{self.index}-{self.expiry_date}.csv")
+            csv_exists: bool = os.path.isfile(
+                f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv")
             try:
                 if not csv_exists:
-                    with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                    with open(
+                            f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-"
+                            f"{self.expiry_date}.csv",
+                            "a", newline="") as row:
                         data_writer: csv.writer = csv.writer(row)
                         data_writer.writerow(self.csv_headers)
             except PermissionError as err:
                 print(err, "13")
                 messagebox.showerror(title="Export Failed",
-                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                     message=f"Failed to access NSE-OCA-"
+                                             f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                             f"{self.expiry_date}.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
                 print(err, "9")
         else:
             try:
-                with open(f"NSE-OCA-{self.index}-{self.expiry_date}.csv", "a", newline="") as row:
+                with open(f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv",
+                          "a", newline="") as row:
                     data_writer: csv.writer = csv.writer(row)
                     data_writer.writerow(values)
             except PermissionError as err:
                 print(err, "14")
                 messagebox.showerror(title="Export Failed",
-                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}.csv.\n"
+                                     message=f"Failed to access NSE-OCA-"
+                                             f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                             f"{self.expiry_date}.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
                 print(err, "15")
@@ -400,7 +510,8 @@ class Nse:
             self.options.entryconfig(self.options.index(2), label="Live Exporting to CSV: On")
             messagebox.showinfo(title="Live Exporting Enabled",
                                 message=f"Data rows will be exported in real time to "
-                                        f"NSE-OCA-{self.index}-{self.expiry_date}.csv.")
+                                        f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-"
+                                        f"{self.expiry_date}.csv.")
 
         self.config_parser.set('main', 'live_export', f'{self.live_export}')
         with open('NSE-OCA.ini', 'w') as f:
@@ -419,7 +530,9 @@ class Nse:
             self.options.entryconfig(self.options.index(3), label="Dump Entire Option Chain to CSV: On")
             messagebox.showinfo(title="Dump Entire Option Chain Enabled",
                                 message=f"Entire Option Chain data will be exported to "
-                                        f"NSE-OCA-{self.index}-{self.expiry_date}-Full.csv.")
+                                        f"NSE-OCA-"
+                                        f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                        f"{self.expiry_date}-Full.csv.")
 
         self.config_parser.set('main', 'save_oc', f'{self.save_oc}')
         with open('NSE-OCA.ini', 'w') as f:
@@ -679,7 +792,7 @@ class Nse:
         max_call_oi_sp_label.grid(row=1, column=0, sticky=N + S + W + E)
         self.max_call_oi_sp_val: Label = Label(bottom_frame, text="", relief=RIDGE)
         self.max_call_oi_sp_val.grid(row=1, column=1, sticky=N + S + W + E)
-        max_call_oi_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+        max_call_oi_label: Label = Label(bottom_frame, text=f"OI ({self.units_str}):", relief=RIDGE,
                                          font=("TkDefaultFont", 9, "bold"))
         max_call_oi_label.grid(row=1, column=2, sticky=N + S + W + E)
         self.max_call_oi_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -692,7 +805,7 @@ class Nse:
         max_put_oi_sp_label.grid(row=1, column=4, sticky=N + S + W + E)
         self.max_put_oi_sp_val: Label = Label(bottom_frame, text="", relief=RIDGE)
         self.max_put_oi_sp_val.grid(row=1, column=5, sticky=N + S + W + E)
-        max_put_oi_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+        max_put_oi_label: Label = Label(bottom_frame, text=f"OI ({self.units_str}):", relief=RIDGE,
                                         font=("TkDefaultFont", 9, "bold"))
         max_put_oi_label.grid(row=1, column=6, sticky=N + S + W + E)
         self.max_put_oi_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -702,7 +815,7 @@ class Nse:
         max_call_oi_sp_2_label.grid(row=2, column=0, sticky=N + S + W + E)
         self.max_call_oi_sp_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
         self.max_call_oi_sp_2_val.grid(row=2, column=1, sticky=N + S + W + E)
-        max_call_oi_2_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+        max_call_oi_2_label: Label = Label(bottom_frame, text=f"OI ({self.units_str}):", relief=RIDGE,
                                            font=("TkDefaultFont", 9, "bold"))
         max_call_oi_2_label.grid(row=2, column=2, sticky=N + S + W + E)
         self.max_call_oi_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -715,7 +828,7 @@ class Nse:
         max_put_oi_sp_2_label.grid(row=2, column=4, sticky=N + S + W + E)
         self.max_put_oi_sp_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
         self.max_put_oi_sp_2_val.grid(row=2, column=5, sticky=N + S + W + E)
-        max_put_oi_2_label: Label = Label(bottom_frame, text="OI (in K):", relief=RIDGE,
+        max_put_oi_2_label: Label = Label(bottom_frame, text=f"OI ({self.units_str}):", relief=RIDGE,
                                           font=("TkDefaultFont", 9, "bold"))
         max_put_oi_2_label.grid(row=2, column=6, sticky=N + S + W + E)
         self.max_put_oi_2_val: Label = Label(bottom_frame, text="", relief=RIDGE)
@@ -1105,7 +1218,7 @@ class Nse:
             int_call_oi: int = int(entire_oc.iloc[i, [0]][0])
             call_oi_list.append(int_call_oi)
         call_oi_index: int = call_oi_list.index(max(call_oi_list))
-        self.max_call_oi: float = round(max(call_oi_list) / 1000, 1)
+        self.max_call_oi: float = round(max(call_oi_list) / self.round_factor, 1)
         self.max_call_oi_sp: numpy.float64 = entire_oc.iloc[call_oi_index]['Strike Price']
 
         put_oi_list: List[int] = []
@@ -1113,7 +1226,7 @@ class Nse:
             int_put_oi: int = int(entire_oc.iloc[i, [20]][0])
             put_oi_list.append(int_put_oi)
         put_oi_index: int = put_oi_list.index(max(put_oi_list))
-        self.max_put_oi: float = round(max(put_oi_list) / 1000, 1)
+        self.max_put_oi: float = round(max(put_oi_list) / self.round_factor, 1)
         self.max_put_oi_sp: numpy.float64 = entire_oc.iloc[put_oi_index]['Strike Price']
 
         sp_range_list: List[numpy.float64] = []
@@ -1130,11 +1243,11 @@ class Nse:
             self.max_put_oi_2 = self.max_put_oi
             self.max_put_oi_sp_2 = self.max_put_oi_sp
         elif len(sp_range_list) == 2:
-            self.max_call_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]) / 1000,
-                                       1)
+            self.max_call_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_put_oi_sp].iloc[0, 0]) /
+                                       self.round_factor, 1)
             self.max_call_oi_sp_2 = self.max_put_oi_sp
-            self.max_put_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]) / 1000,
-                                      1)
+            self.max_put_oi_2 = round((entire_oc[entire_oc['Strike Price'] == self.max_call_oi_sp].iloc[0, 20]) /
+                                      self.round_factor, 1)
             self.max_put_oi_sp_2 = self.max_call_oi_sp
         else:
             call_oi_list_2: List[int] = []
@@ -1142,7 +1255,7 @@ class Nse:
                 int_call_oi_2: int = int(entire_oc.iloc[i, [0]][0])
                 call_oi_list_2.append(int_call_oi_2)
             call_oi_index_2: int = put_oi_index + call_oi_list_2.index(max(call_oi_list_2))
-            self.max_call_oi_2 = round(max(call_oi_list_2) / 1000, 1)
+            self.max_call_oi_2 = round(max(call_oi_list_2) / self.round_factor, 1)
             self.max_call_oi_sp_2 = entire_oc.iloc[call_oi_index_2]['Strike Price']
 
             put_oi_list_2: List[int] = []
@@ -1150,7 +1263,7 @@ class Nse:
                 int_put_oi_2: int = int(entire_oc.iloc[i, [20]][0])
                 put_oi_list_2.append(int_put_oi_2)
             put_oi_index_2: int = put_oi_index + 1 + put_oi_list_2.index(max(put_oi_list_2))
-            self.max_put_oi_2 = round(max(put_oi_list_2) / 1000, 1)
+            self.max_put_oi_2 = round(max(put_oi_list_2) / self.round_factor, 1)
             self.max_put_oi_sp_2 = entire_oc.iloc[put_oi_index_2]['Strike Price']
 
         total_call_oi: int = sum(call_oi_list)
@@ -1181,10 +1294,10 @@ class Nse:
             c2 = 0
         if isinstance(c3, str):
             c3 = 0
-        self.call_sum: numpy.float64 = round((c1 + c2 + c3) / 1000, 1)
+        self.call_sum: numpy.float64 = round((c1 + c2 + c3) / self.round_factor, 1)
         if self.call_sum == -0:
             self.call_sum = 0.0
-        self.call_boundary: numpy.float64 = round(c3 / 1000, 1)
+        self.call_boundary: numpy.float64 = round(c3 / self.round_factor, 1)
 
         o1: pandas.Series = a.iloc[:, 1]
         p1: numpy.int64 = o1.get(index)
@@ -1204,8 +1317,8 @@ class Nse:
             self.p4 = 0
         if isinstance(self.p5, str):
             self.p5 = 0
-        self.put_sum: numpy.float64 = round((p1 + p2 + p3) / 1000, 1)
-        self.put_boundary: numpy.float64 = round(p1 / 1000, 1)
+        self.put_sum: numpy.float64 = round((p1 + p2 + p3) / self.round_factor, 1)
+        self.put_boundary: numpy.float64 = round(p1 / self.round_factor, 1)
         self.difference: float = float(round(self.call_sum - self.put_sum, 1))
         self.call_itm: numpy.float64
         if self.p5 == 0:
@@ -1233,11 +1346,15 @@ class Nse:
 
         if self.save_oc:
             try:
-                entire_oc.to_csv(f"NSE-OCA-{self.index}-{self.expiry_date}-Full.csv", index=False)
+                entire_oc.to_csv(
+                    f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}-Full.csv",
+                    index=False)
             except PermissionError as err:
                 print(err, "11")
                 messagebox.showerror(title="Export Failed",
-                                     message=f"Failed to access NSE-OCA-{self.index}-{self.expiry_date}-Full.csv.\n"
+                                     message=f"Failed to access NSE-OCA-"
+                                             f"{self.index if self.option_mode == 'Index' else self.stock}-"
+                                             f"{self.expiry_date}-Full.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
                 print(err, "16")
