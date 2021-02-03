@@ -32,7 +32,6 @@ class Nse:
         self.stop: bool = False
         self.dates: List[str] = [""]
         self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
-        # noinspection SpellCheckingInspection
         self.stocks: List[str] = ['AARTIIND', 'ACC', 'ADANIENT', 'ADANIPORTS', 'AMARAJABAT', 'AMBUJACEM', 'APOLLOHOSP',
                                   'APOLLOTYRE', 'ASHOKLEY',
                                   'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJAJFINSV', 'BAJFINANCE',
