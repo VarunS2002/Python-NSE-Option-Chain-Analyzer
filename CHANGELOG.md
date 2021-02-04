@@ -2,6 +2,22 @@
 
 <br>
 
+># [5.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.0)
+## Major Feature Update
+- Added Support for Stocks (Total 141 Stocks). Issue: [#8](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/8)
+  - Set Index Mode or Stock Mode then select your preferred Index or Stock 
+  - Values are in 10s in Stock mode and 1000s in Index mode (to compensate for low values of stocks)
+  - Symbol of the Stock is present in the names of the .csv files
+  - Appropriate Units are reflected in the headers of .csv files
+- Added Saving New settings for subsequent runs
+  - New Saved settings:
+    * Index/Stock Mode
+    * Selected Stock
+- Fixed possible issues while reading configuration
+- Optimised retrieving data from the API
+
+<br>
+
 ># [4.1](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/4.1)
 ## Feature and Bug Fix Update
 - Added Dumping Entire Option Chain data to a .csv file. Issues: [#3](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/3) and [#4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/4)
