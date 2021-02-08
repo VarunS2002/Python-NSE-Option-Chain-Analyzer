@@ -88,21 +88,19 @@ class Nse:
         self.url_oc: str = "https://www.nseindia.com/option-chain"
         self.url_index: str = "https://www.nseindia.com/api/option-chain-indices?symbol="
         self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
+        self.url_icon: str = "https://raw.githubusercontent.com/VarunS2002/" \
+                             "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
         self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10 else None
-        self.icon_path: str = Nse.get_icon_path() if os.path.isfile(Nse.get_icon_path()) else ''
+        self.get_icon()
         self.login_win(window)
 
-    @staticmethod
-    def get_icon_path() -> str:
-        base_path: str
-        try:
-            # noinspection PyProtectedMember,PyUnresolvedReferences
-            base_path = sys._MEIPASS
-        except AttributeError:
-            base_path = os.path.abspath(".")
-        return os.path.join(base_path, 'nse_logo.png')
+    def get_icon(self) -> None:
+        icon_raw: requests.Response = requests.get(self.url_icon, headers=self.headers, stream=True)
+        with open('.NSE-OCA.png', 'wb') as f:
+            for chunk in icon_raw.iter_content(1024):
+                f.write(chunk)
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
@@ -298,14 +296,14 @@ class Nse:
     def login_win(self, window: Tk) -> None:
         self.login: Tk = window
         self.login.title("NSE-Option-Chain-Analyzer")
+        self.login.protocol('WM_DELETE_WINDOW', lambda file='.NSE-OCA.png': os.remove(file) or self.login.destroy())
         window_width: int = self.login.winfo_reqwidth()
         window_height: int = self.login.winfo_reqheight()
         position_right: int = int(self.login.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
         self.login.geometry("320x160+{}+{}".format(position_right, position_down))
         self.login.resizable(False, False)
-        if self.icon_path:
-            self.login.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.login.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -651,8 +649,7 @@ class Nse:
         position_right: int = int(self.info.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
-        if self.icon_path:
-            self.info.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.info.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -707,6 +704,7 @@ class Nse:
             self.session.close()
             if self.logging:
                 print('----------Quitting Program----------')
+            os.remove('.NSE-OCA.png')
             self.root.destroy()
             sys.exit()
         elif not ask_quit:
@@ -722,8 +720,7 @@ class Nse:
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
-        if self.icon_path:
-            self.root.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.root.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -949,7 +946,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Upper Boundary Strike Price changed",
                                         f"Changed from {self.old_max_call_oi_sp} to {self.max_call_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_max_call_oi_sp = self.max_call_oi_sp
 
         if self.first_run or self.old_max_call_oi_sp_2 == self.max_call_oi_sp_2:
@@ -958,7 +955,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Upper Boundary Strike Price 2 changed",
                                         f"Changed from {self.old_max_call_oi_sp_2} to {self.max_call_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
 
         if self.first_run or self.old_max_put_oi_sp == self.max_put_oi_sp:
@@ -967,7 +964,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Lower Boundary Strike Price changed",
                                         f"Changed from {self.old_max_put_oi_sp} to {self.max_put_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_max_put_oi_sp = self.max_put_oi_sp
 
         if self.first_run or self.old_max_put_oi_sp_2 == self.max_put_oi_sp_2:
@@ -976,7 +973,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Lower Boundary Strike Price 2 changed",
                                         f"Changed from {self.old_max_put_oi_sp_2} to {self.max_put_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
 
         red: str = "#e53935"
@@ -1001,7 +998,7 @@ class Nse:
         else:
             if self.notifications:
                 self.toaster.show_toast("Open Interest changed", f"Changed from {self.old_oi_label} to {oi_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_oi_label = oi_label
 
         if self.put_call_ratio >= 1:
@@ -1037,7 +1034,7 @@ class Nse:
         else:
             if self.notifications:
                 self.toaster.show_toast("Call ITM changed", f"Changed from {self.old_call_label} to {call}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_call_label = call
 
         self.old_put_label: str
@@ -1053,7 +1050,7 @@ class Nse:
         else:
             if self.notifications:
                 self.toaster.show_toast("Put ITM changed", f"Changed from {self.old_put_label} to {put}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_put_label = put
 
         self.old_call_exits_label: str
@@ -1076,7 +1073,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Call Exits changed",
                                         f"Changed from {self.old_call_exits_label} to {call_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_call_exits_label = call_exits_label
 
         self.old_put_exits_label: str
@@ -1099,7 +1096,7 @@ class Nse:
             if self.notifications:
                 self.toaster.show_toast("Put Exits changed",
                                         f"Changed from {self.old_put_exits_label} to {put_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
             self.old_put_exits_label = put_exits_label
 
         output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
