@@ -3,4 +3,4 @@ pandas>=1.1.4
 requests>=2.24.0
 streamtologger>=2017.1
 tksheet>=4.9.96
-win10toast>=0.9
+win10toast>=0.9; platform_system == "Windows" and platform_release == "10"
