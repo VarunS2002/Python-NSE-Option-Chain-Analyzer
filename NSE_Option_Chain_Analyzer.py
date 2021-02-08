@@ -1,3 +1,4 @@
+import bs4
 import configparser
 import csv
 import datetime
@@ -37,36 +38,21 @@ class Nse:
         self.first_run: bool = True
         self.stop: bool = False
         self.dates: List[str] = [""]
-        self.indices: List[str] = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
-        self.stocks: List[str] = ['AARTIIND', 'ACC', 'ADANIENT', 'ADANIPORTS', 'AMARAJABAT', 'AMBUJACEM', 'APOLLOHOSP',
-                                  'APOLLOTYRE', 'ASHOKLEY',
-                                  'ASIANPAINT', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJAJFINSV', 'BAJFINANCE',
-                                  'BALKRISIND', 'BANDHANBNK',
-                                  'BANKBARODA', 'BATAINDIA', 'BEL', 'BERGEPAINT', 'BHARATFORG', 'BHARTIARTL', 'BHEL',
-                                  'BIOCON', 'BOSCHLTD',
-                                  'BPCL', 'BRITANNIA', 'CADILAHC', 'CANBK', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE',
-                                  'COLPAL', 'CONCOR',
-                                  'CUMMINSIND', 'DABUR', 'DIVISLAB', 'DLF', 'DRREDDY', 'EICHERMOT', 'ESCORTS',
-                                  'EXIDEIND', 'FEDERALBNK', 'GAIL',
-                                  'GLENMARK', 'GMRINFRA', 'GODREJCP', 'GODREJPROP', 'GRASIM', 'HAVELLS', 'HCLTECH',
-                                  'HDFC', 'HDFCAMC', 'HDFCBANK',
-                                  'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDPETRO', 'HINDUNILVR', 'IBULHSGFIN',
-                                  'ICICIBANK', 'ICICIGI',
-                                  'ICICIPRULI', 'IDEA', 'IDFCFIRSTB', 'IGL', 'INDIGO', 'INDUSINDBK', 'INDUSTOWER',
-                                  'INFRATEL', 'INFY', 'IOC',
-                                  'ITC', 'JINDALSTEL', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'L&TFH', 'LALPATHLAB',
-                                  'LICHSGFIN', 'LT', 'LUPIN',
-                                  'M&M', 'M&MFIN', 'MANAPPURAM', 'MARICO', 'MARUTI', 'MCDOWELL-N', 'MFSL', 'MGL',
-                                  'MINDTREE', 'MOTHERSUMI', 'MRF',
-                                  'MUTHOOTFIN', 'NATIONALUM', 'NAUKRI', 'NESTLEIND', 'NMDC', 'NTPC', 'ONGC', 'PAGEIND',
-                                  'PEL', 'PETRONET', 'PFC',
-                                  'PIDILITIND', 'PNB', 'POWERGRID', 'PVR', 'RAMCOCEM', 'RBLBANK', 'RECLTD', 'RELIANCE',
-                                  'SAIL', 'SBILIFE', 'SBIN',
-                                  'SHREECEM', 'SIEMENS', 'SRF', 'SRTRANSFIN', 'SUNPHARMA', 'SUNTV', 'TATACHEM',
-                                  'TATACONSUM', 'TATAMOTORS',
-                                  'TATAPOWER', 'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TORNTPHARM', 'TORNTPOWER',
-                                  'TVSMOTOR', 'UBL', 'ULTRACEMCO',
-                                  'UPL', 'VEDL', 'VOLTAS', 'WIPRO', 'ZEEL']
+        self.indices: List[str] = []
+        self.stocks: List[str] = []
+        self.url_oc: str = "https://www.nseindia.com/option-chain"
+        self.url_index: str = "https://www.nseindia.com/api/option-chain-indices?symbol="
+        self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
+        self.url_symbols: str = "https://www.nseindia.com/products-services/" \
+                                "equity-derivatives-list-underlyings-information"
+        self.url_icon: str = "https://raw.githubusercontent.com/VarunS2002/" \
+                             "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
+        self.headers: Dict[str, str] = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
+                          'like Gecko) '
+                          'Chrome/80.0.3987.149 Safari/537.36',
+            'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
+        self.get_symbols()
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.create_config() if not os.path.isfile('NSE-OCA.ini') else None
         self.get_config()
@@ -80,21 +66,39 @@ class Nse:
             'Time', 'Value', f'Call Sum ({self.units_str})', f'Put Sum ({self.units_str})',
             f'Difference ({self.units_str})',
             f'Call Boundary ({self.units_str})', f'Put Boundary ({self.units_str})', 'Call ITM', 'Put ITM')
-        self.headers: Dict[str, str] = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
-                          'like Gecko) '
-                          'Chrome/80.0.3987.149 Safari/537.36',
-            'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
-        self.url_oc: str = "https://www.nseindia.com/option-chain"
-        self.url_index: str = "https://www.nseindia.com/api/option-chain-indices?symbol="
-        self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
-        self.url_icon: str = "https://raw.githubusercontent.com/VarunS2002/" \
-                             "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
         self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10 else None
         self.get_icon()
         self.login_win(window)
+
+    def get_symbols(self) -> None:
+        symbols_information: requests.Response = requests.get(self.url_symbols, headers=self.headers)
+        symbols_information_soup: bs4.BeautifulSoup = bs4.BeautifulSoup(symbols_information.content, "html.parser")
+        symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
+        symbols_table_rows: List[bs4.element.Tag] = list(symbols_table.findChildren(['th', 'tr']))
+        symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows)-1)]
+        for column in range(len(symbols_table_rows)-1):
+            symbols_table_rows_str[column] = str(symbols_table_rows[column])
+        divider_row: str = '<tr>\n' \
+                           '<td colspan="3"><strong>Derivatives on Individual Securities</strong></td>\n' \
+                           '</tr>'
+        for column in range(4, symbols_table_rows_str.index(divider_row)+1):
+            cells: bs4.element.ResultSet = symbols_table_rows[column].findChildren('td')
+            column: int = 0
+            for cell in cells:
+                if column == 2:
+                    self.indices.append(cell.string)
+                column += 1
+        for column in reversed(range(symbols_table_rows_str.index(divider_row)+1)):
+            symbols_table_rows.pop(column)
+        for row in symbols_table_rows:
+            cells: bs4.element.ResultSet = row.findChildren('td')
+            column: int = 0
+            for cell in cells:
+                if column == 2:
+                    self.stocks.append(cell.string)
+                column += 1
 
     def get_icon(self) -> None:
         icon_raw: requests.Response = requests.get(self.url_icon, headers=self.headers, stream=True)
