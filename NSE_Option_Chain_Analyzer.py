@@ -2,11 +2,12 @@ import configparser
 import csv
 import datetime
 import os
+import platform
 import sys
 import time
 import webbrowser
 from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, Label, Entry, SOLID, RIDGE, \
-    DISABLED, NORMAL, N, S, E, W, LEFT, messagebox
+    DISABLED, NORMAL, N, S, E, W, LEFT, messagebox, PhotoImage
 from tkinter.ttk import Combobox, Button
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
 
@@ -15,7 +16,12 @@ import pandas
 import requests
 import streamtologger
 import tksheet
-import win10toast
+
+is_windows: bool = platform.system() == "Windows"
+is_windows_10: bool = is_windows and platform.release() == "10"
+if is_windows_10:
+    # noinspection PyUnresolvedReferences
+    import win10toast
 
 
 # noinspection PyAttributeOutsideInit
@@ -84,7 +90,7 @@ class Nse:
         self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
-        self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier()
+        self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10 else None
         self.icon_path: str = Nse.get_icon_path() if os.path.isfile(Nse.get_icon_path()) else ''
         self.login_win(window)
 
@@ -96,7 +102,7 @@ class Nse:
             base_path = sys._MEIPASS
         except AttributeError:
             base_path = os.path.abspath(".")
-        return os.path.join(base_path, 'nse_logo.ico')
+        return os.path.join(base_path, 'nse_logo.png')
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
@@ -154,7 +160,8 @@ class Nse:
             self.seconds: int = self.config_parser.getint('main', 'seconds')
             self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
-            self.notifications: bool = self.config_parser.getboolean('main', 'notifications')
+            self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
+                if is_windows_10 else False
             self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             self.update: bool = self.config_parser.getboolean('main', 'update')
             self.logging: bool = self.config_parser.getboolean('main', 'logging')
@@ -298,7 +305,7 @@ class Nse:
         self.login.geometry("320x160+{}+{}".format(position_right, position_down))
         self.login.resizable(False, False)
         if self.icon_path:
-            self.login.iconbitmap(self.icon_path)
+            self.login.iconphoto(True, PhotoImage(file=self.icon_path))
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -597,9 +604,9 @@ class Nse:
             try:
                 # noinspection PyProtectedMember,PyUnresolvedReferences
                 base_path: str = sys._MEIPASS
-                print('.exe version : ' + Nse.version)
+                print(platform.system() + ' ' + platform.release() + ' .exe version ' + Nse.version)
             except AttributeError:
-                print('.py version : ' + Nse.version)
+                print(platform.system() + ' ' + platform.release() + ' .py version ' + Nse.version)
 
             try:
                 self.options.entryconfig(self.options.index(8), label="Debug Logging: On")
@@ -645,7 +652,7 @@ class Nse:
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
         if self.icon_path:
-            self.info.iconbitmap(self.icon_path)
+            self.info.iconphoto(True, PhotoImage(file=self.icon_path))
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -716,7 +723,7 @@ class Nse:
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
         if self.icon_path:
-            self.root.iconbitmap(self.icon_path)
+            self.root.iconphoto(True, PhotoImage(file=self.icon_path))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -729,7 +736,8 @@ class Nse:
         self.options.add_command(label=f"Dump Entire Option Chain to CSV: {'On' if self.save_oc else 'Off'}",
                                  accelerator="(Ctrl+O)", command=self.toggle_save_oc)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
-                                 accelerator="(Ctrl+N)", command=self.toggle_notifications)
+                                 accelerator="(Ctrl+N)", command=self.toggle_notifications,
+                                 state=NORMAL if is_windows_10 else DISABLED)
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
                                  accelerator="(Ctrl+K)", command=self.toggle_auto_stop)
         self.options.add_separator()
@@ -746,7 +754,7 @@ class Nse:
         self.root.bind('<Control-s>', self.export)
         self.root.bind('<Control-b>', self.toggle_live_export)
         self.root.bind('<Control-o>', self.toggle_save_oc)
-        self.root.bind('<Control-n>', self.toggle_notifications)
+        self.root.bind('<Control-n>', self.toggle_notifications) if is_windows_10 else None
         self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-u>', self.toggle_updates)
         self.root.bind('<Control-l>', self.log)
@@ -973,7 +981,7 @@ class Nse:
 
         red: str = "#e53935"
         green: str = "#00e676"
-        default: str = "SystemButtonFace"
+        default: str = "SystemButtonFace" if is_windows else "#d9d9d9"
 
         bg: str
 
