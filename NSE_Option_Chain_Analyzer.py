@@ -49,9 +49,9 @@ class Nse:
                              "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
-                          'like Gecko) '
-                          'Chrome/80.0.3987.149 Safari/537.36',
-            'accept-language': 'en,gu;q=0.9,hi;q=0.8', 'accept-encoding': 'gzip, deflate, br'}
+                          'like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+            'accept-language': 'en,gu;q=0.9,hi;q=0.8',
+            'accept-encoding': 'gzip, deflate, br'}
         self.get_symbols()
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.create_config() if not os.path.isfile('NSE-OCA.ini') else None
@@ -77,20 +77,20 @@ class Nse:
         symbols_information_soup: bs4.BeautifulSoup = bs4.BeautifulSoup(symbols_information.content, "html.parser")
         symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
         symbols_table_rows: List[bs4.element.Tag] = list(symbols_table.findChildren(['th', 'tr']))
-        symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows)-1)]
-        for column in range(len(symbols_table_rows)-1):
+        symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows) - 1)]
+        for column in range(len(symbols_table_rows) - 1):
             symbols_table_rows_str[column] = str(symbols_table_rows[column])
         divider_row: str = '<tr>\n' \
                            '<td colspan="3"><strong>Derivatives on Individual Securities</strong></td>\n' \
                            '</tr>'
-        for column in range(4, symbols_table_rows_str.index(divider_row)+1):
+        for column in range(4, symbols_table_rows_str.index(divider_row) + 1):
             cells: bs4.element.ResultSet = symbols_table_rows[column].findChildren('td')
             column: int = 0
             for cell in cells:
                 if column == 2:
                     self.indices.append(cell.string)
                 column += 1
-        for column in reversed(range(symbols_table_rows_str.index(divider_row)+1)):
+        for column in reversed(range(symbols_table_rows_str.index(divider_row) + 1)):
             symbols_table_rows.pop(column)
         for row in symbols_table_rows:
             cells: bs4.element.ResultSet = row.findChildren('td')
