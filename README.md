@@ -1,7 +1,7 @@
 # Python NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
-[![Latest: v5.0](https://img.shields.io/badge/release-v5.0-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.0/NSE_Option_Chain_Analyzer_5.0.exe)
+[![Latest: v5.2](https://img.shields.io/badge/release-v5.2-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.2/NSE_Option_Chain_Analyzer_5.2.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -12,29 +12,26 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 ## Installation:
 
->#### Types of variants available:
- 
- 1. `.exe` (Windows Executable)
+>#### Method 1 (Windows):
 
- 2. `.py` (Python Source Code)
+- Download the `.exe` (Windows Executable) file
 
-- Does not support Linux
+- Run it directly
 
-- Requirements for 1:
- 
-    - Windows OS  
+>#### Method 2 (Windows and Linux):
 
-- Requirements for 2:
- 
-     - Python 3.6+ 
-     
-     - For Windows https://www.python.org/downloads/ is recommended
-    
-     - Add Python to PATH/Environment Variables during installation in Windows (recommended)
-    
-     - Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
-       
-     - Install missing modules using `pip install -r requirements.txt`
+- Requirements:
+  - Python 3.6+
+  - Additional steps for Linux:
+    - `apt-get install python3-tk`
+    - `apt install python3-pip`
+  - For Windows https://www.python.org/downloads/ is recommended
+  
+- Download the `.py` (Python Source Code) file
+
+- Required modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
+
+- Install missing modules using `pip install -r requirements.txt`
 
 ## Usage:
 
@@ -52,7 +49,9 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 ## Note:
 
-- If there is an error in fetching dates then try refreshing
+- If there is an error in fetching dates on login screen then try refreshing
+
+- If there is an error in fetching dates on main screen then try stopping and again starting from option menu 
 
 - If you face any issue or have a suggestion then feel free to open an issue. 
 
@@ -66,6 +65,8 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
 
+- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/) is used for scraping the list of stocks and indices
+
 - [numpy](https://pypi.org/project/numpy/) is used for data types
 
 - [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
@@ -76,7 +77,7 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - [tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
 
-- [win10toast](https://pypi.org/project/win10toast/) is used for Windows Toast notifications
+- [win10toast](https://pypi.org/project/win10toast/) is used for Windows 10 Toast notifications
 
 ## Features:
 
@@ -84,159 +85,13 @@ Calculations are based on [Mr. Sameer Dharaskar's Course](http://advancesharetra
 
 - New data rows are added only if the NSE server updates its time or data (To prevent displaying duplicate data)
 
-- Supported Indices :
-     * NIFTY
-     * BANKNIFTY
-     * FINNIFTY
-
-- Supported Stocks :
-  * AARTIIND
-  * ACC
-  * ADANIENT
-  * ADANIPORTS
-  * AMARAJABAT
-  * AMBUJACEM
-  * APOLLOHOSP
-  * APOLLOTYRE
-  * ASHOKLEY
-  * ASIANPAINT
-  * AUROPHARMA
-  * AXISBANK
-  * BAJAJ-AUTO
-  * BAJAJFINSV
-  * BAJFINANCE
-  * BALKRISIND
-  * BANDHANBNK
-  * BANKBARODA
-  * BATAINDIA
-  * BEL
-  * BERGEPAINT
-  * BHARATFORG
-  * BHARTIARTL
-  * BHEL
-  * BIOCON
-  * BOSCHLTD
-  * BPCL
-  * BRITANNIA
-  * CADILAHC
-  * CANBK
-  * CHOLAFIN
-  * CIPLA
-  * COALINDIA
-  * COFORGE
-  * COLPAL
-  * CONCOR
-  * CUMMINSIND
-  * DABUR
-  * DIVISLAB
-  * DLF
-  * DRREDDY
-  * EICHERMOT
-  * ESCORTS
-  * EXIDEIND
-  * FEDERALBNK
-  * GAIL
-  * GLENMARK
-  * GMRINFRA
-  * GODREJCP
-  * GODREJPROP
-  * GRASIM
-  * HAVELLS
-  * HCLTECH
-  * HDFC
-  * HDFCAMC
-  * HDFCBANK
-  * HDFCLIFE
-  * HEROMOTOCO
-  * HINDALCO
-  * HINDPETRO
-  * HINDUNILVR
-  * IBULHSGFIN
-  * ICICIBANK
-  * ICICIGI
-  * ICICIPRULI
-  * IDEA
-  * IDFCFIRSTB
-  * IGL
-  * INDIGO
-  * INDUSINDBK
-  * INDUSTOWER
-  * INFRATEL
-  * INFY
-  * IOC
-  * ITC
-  * JINDALSTEL
-  * JSWSTEEL
-  * JUBLFOOD
-  * KOTAKBANK
-  * L&TFH
-  * LALPATHLAB
-  * LICHSGFIN
-  * LT
-  * LUPIN
-  * M&M
-  * M&MFIN
-  * MANAPPURAM
-  * MARICO
-  * MARUTI
-  * MCDOWELL-N
-  * MFSL
-  * MGL
-  * MINDTREE
-  * MOTHERSUMI
-  * MRF
-  * MUTHOOTFIN
-  * NATIONALUM
-  * NAUKRI
-  * NESTLEIND
-  * NMDC
-  * NTPC
-  * ONGC
-  * PAGEIND
-  * PEL
-  * PETRONET
-  * PFC
-  * PIDILITIND
-  * PNB
-  * POWERGRID
-  * PVR
-  * RAMCOCEM
-  * RBLBANK
-  * RECLTD
-  * RELIANCE
-  * SAIL
-  * SBILIFE
-  * SBIN
-  * SHREECEM
-  * SIEMENS
-  * SRF
-  * SRTRANSFIN
-  * SUNPHARMA
-  * SUNTV
-  * TATACHEM
-  * TATACONSUM
-  * TATAMOTORS
-  * TATAPOWER
-  * TATASTEEL
-  * TCS
-  * TECHM
-  * TITAN
-  * TORNTPHARM
-  * TORNTPOWER
-  * TVSMOTOR
-  * UBL
-  * ULTRACEMCO
-  * UPL
-  * VEDL
-  * VOLTAS
-  * WIPRO
-  * ZEEL
+- Supported Indices and Stocks: https://www.nseindia.com/products-services/equity-derivatives-list-underlyings-information
 
 - Supports multiple instances with different indices/stocks and/or strike prices selected
 
 - Red and Green colour indication for data based on trends
 
-- Toast Notifications for notifying when trend changes. Notified changes:
+- Toast Notifications for notifying when trend changes (Windows 10 only). Notified changes:
      * Open Interest: Bullish/Bearish
      * Open Interest Upper Boundary Strike Prices: Change in Value
      * Open Interest Lower Boundary Strike Prices: Change in Value
@@ -329,6 +184,10 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
   <br>![Selecting_Data](https://i.imgur.com/qYoy2iO.png) <br><br>
 
-- Option Menu
+- Option Menu:
 
-  <br>![Option_Menu](https://i.imgur.com/jtrjCvY.png)
+  <br>![Option_Menu](https://i.imgur.com/jtrjCvY.png) <br><br>
+
+- Notification:
+
+  <br>![Notification](https://i.imgur.com/h1KENYo.png) <br><br>

@@ -2,6 +2,27 @@
 
 <br>
 
+># [5.2](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.2)
+## Compatibility and Feature Update
+- Added Support for Linux
+  - Notifications only supports Windows 10
+- List of Stocks and Indices is loaded dynamically from https://www.nseindia.com/products-services/equity-derivatives-list-underlyings-information everytime
+  - Program is now not required to be updated when there are changes in Stocks and Indices
+- Added name of stock or index in notifications
+- Reworked configuration reading and writing
+  - Settings will stay persistent across updates
+  - Only invalid values are corrected and missing values are appended
+  - Unless a user tampers with it, the config does not reset completely
+- If your running the .py version, icons are now temporarily downloaded every time you run the program and need not be saved separately
+- Disabled text input in Dropdown menus on Login page to prevent errors
+- Improved Logging:
+  - New Logging messages:
+    * OS Name and Version
+    * Error Class along with Error Message
+- Note: Users who are still running version 4.x are recommended to directly update to 5.2 to prevent settings from resetting 
+
+<br>
+
 ># [5.0](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.0)
 ## Major Feature Update
 - Added Support for Stocks (Total 141 Stocks). Issue: [#8](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/8)
