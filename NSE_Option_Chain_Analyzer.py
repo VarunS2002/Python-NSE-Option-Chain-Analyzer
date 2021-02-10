@@ -1,4 +1,3 @@
-import bs4
 import configparser
 import csv
 import datetime
@@ -12,6 +11,7 @@ from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, Label
 from tkinter.ttk import Combobox, Button
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
 
+import bs4
 import numpy
 import pandas
 import requests
