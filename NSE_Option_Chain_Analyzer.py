@@ -140,7 +140,7 @@ class Nse:
                 if self.index not in self.indices:
                     raise ValueError(f'{self.index} is not a valid index')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="index")
                 self.index: str = self.config_parser.get('main', 'index')
             try:
@@ -148,7 +148,7 @@ class Nse:
                 if self.stock not in self.stocks:
                     raise ValueError(f'{self.stock} is not a valid stock')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="stock")
                 self.stock: str = self.config_parser.get('main', 'stock')
             try:
@@ -156,7 +156,7 @@ class Nse:
                 if self.option_mode not in ('Index', 'Stock'):
                     raise ValueError(f'{self.option_mode} is not a valid option mode')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="option_mode")
                 self.option_mode: str = self.config_parser.get('main', 'option_mode')
             try:
@@ -164,50 +164,50 @@ class Nse:
                 if self.seconds not in (60, 120, 180, 300, 600, 900):
                     raise ValueError(f'{self.seconds} is not a refresh interval')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="seconds")
                 self.seconds: int = self.config_parser.getint('main', 'seconds')
             try:
                 self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="live_export")
                 self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
             try:
                 self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="save_oc")
                 self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
             try:
                 self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
                     if is_windows_10 else False
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="notifications")
                 self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
                     if is_windows_10 else False
             try:
                 self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="auto_stop")
                 self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             try:
                 self.update: bool = self.config_parser.getboolean('main', 'update')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="update")
                 self.update: bool = self.config_parser.getboolean('main', 'update')
             try:
                 self.logging: bool = self.config_parser.getboolean('main', 'logging')
             except (configparser.NoOptionError, ValueError) as err:
-                print(err, "0")
+                print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="logging")
                 self.logging: bool = self.config_parser.getboolean('main', 'logging')
         except (configparser.NoSectionError, configparser.MissingSectionHeaderError,
                 configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
-            print(err, "0")
+            print(err, sys.exc_info()[0], "0")
             self.create_config(corrupted=True)
             return self.get_config()
 
@@ -282,7 +282,7 @@ class Nse:
         except Exception as err:
             print(request)
             print(response)
-            print(err, "1")
+            print(err, sys.exc_info()[0], "1")
             messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
             self.dates.clear()
             self.dates = [""]
@@ -295,7 +295,7 @@ class Nse:
                 json_data = response.json()
             except Exception as err:
                 print(response)
-                print(err, "2")
+                print(err, sys.exc_info()[0], "2")
                 json_data = {}
         else:
             json_data = {}
@@ -307,7 +307,7 @@ class Nse:
                 self.date_menu.config(values=tuple(self.dates))
                 self.date_menu.current(0)
             except TclError as err:
-                print(err, "3")
+                print(err, sys.exc_info()[0], "3")
             return
         self.dates.clear()
         for dates in json_data['records']['expiryDates']:
@@ -336,7 +336,7 @@ class Nse:
         except Exception as err:
             print(request)
             print(response)
-            print(err, "4")
+            print(err, sys.exc_info()[0], "4")
             try:
                 self.session.close()
                 self.session = requests.Session()
@@ -347,14 +347,14 @@ class Nse:
             except Exception as err:
                 print(request)
                 print(response)
-                print(err, "5")
+                print(err, sys.exc_info()[0], "5")
                 return
         if response is not None:
             try:
                 json_data: Any = response.json()
             except Exception as err:
                 print(response)
-                print(err, "6")
+                print(err, sys.exc_info()[0], "6")
                 json_data = {}
         else:
             json_data = {}
@@ -485,7 +485,7 @@ class Nse:
             self.login.destroy()
             self.main_win()
         except ValueError as err:
-            print(err, "7")
+            print(err, sys.exc_info()[0], "7")
             messagebox.showerror(title="Error", message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
 
     # noinspection PyUnusedLocal
@@ -524,14 +524,14 @@ class Nse:
                                         f"{self.index if self.option_mode == 'Index' else self.stock}-"
                                         f"{self.expiry_date}.csv.")
         except PermissionError as err:
-            print(err, "12")
+            print(err, sys.exc_info()[0], "12")
             messagebox.showerror(title="Export Failed",
                                  message=f"Failed to access NSE-OCA-"
                                          f"{self.index if self.option_mode == 'Index' else self.stock}-"
                                          f"{self.expiry_date}.csv.\n"
                                          f"Permission Denied. Try closing any apps using it.")
         except Exception as err:
-            print(err, "8")
+            print(err, sys.exc_info()[0], "8")
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
@@ -548,14 +548,14 @@ class Nse:
                         data_writer: csv.writer = csv.writer(row)
                         data_writer.writerow(self.csv_headers)
             except PermissionError as err:
-                print(err, "13")
+                print(err, sys.exc_info()[0], "13")
                 messagebox.showerror(title="Export Failed",
                                      message=f"Failed to access NSE-OCA-"
                                              f"{self.index if self.option_mode == 'Index' else self.stock}-"
                                              f"{self.expiry_date}.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
-                print(err, "9")
+                print(err, sys.exc_info()[0], "9")
         else:
             try:
                 with open(f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv",
@@ -563,14 +563,14 @@ class Nse:
                     data_writer: csv.writer = csv.writer(row)
                     data_writer.writerow(values)
             except PermissionError as err:
-                print(err, "14")
+                print(err, sys.exc_info()[0], "14")
                 messagebox.showerror(title="Export Failed",
                                      message=f"Failed to access NSE-OCA-"
                                              f"{self.index if self.option_mode == 'Index' else self.stock}-"
                                              f"{self.expiry_date}.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
-                print(err, "15")
+                print(err, sys.exc_info()[0], "15")
 
     # noinspection PyUnusedLocal
     def toggle_live_export(self, event: Optional[Event] = None) -> None:
@@ -1350,7 +1350,7 @@ class Nse:
         try:
             index: int = int(entire_oc[entire_oc['Strike Price'] == self.sp].index.tolist()[0])
         except IndexError as err:
-            print(err, "10")
+            print(err, sys.exc_info()[0], "10")
             messagebox.showerror(title="Error",
                                  message="Incorrect Strike Price.\nPlease enter correct Strike Price.")
             self.root.destroy()
@@ -1423,14 +1423,14 @@ class Nse:
                     f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}-Full.csv",
                     index=False)
             except PermissionError as err:
-                print(err, "11")
+                print(err, sys.exc_info()[0], "11")
                 messagebox.showerror(title="Export Failed",
                                      message=f"Failed to access NSE-OCA-"
                                              f"{self.index if self.option_mode == 'Index' else self.stock}-"
                                              f"{self.expiry_date}-Full.csv.\n"
                                              f"Permission Denied. Try closing any apps using it.")
             except Exception as err:
-                print(err, "16")
+                print(err, sys.exc_info()[0], "16")
 
         if self.first_run:
             if self.update:
