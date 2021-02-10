@@ -101,10 +101,17 @@ class Nse:
                 column += 1
 
     def get_icon(self) -> None:
-        icon_raw: requests.Response = requests.get(self.url_icon, headers=self.headers, stream=True)
-        with open('.NSE-OCA.png', 'wb') as f:
-            for chunk in icon_raw.iter_content(1024):
-                f.write(chunk)
+        self.icon_path: str
+        try:
+            # noinspection PyProtectedMember,PyUnresolvedReferences
+            base_path: str = sys._MEIPASS
+            self.icon_path = os.path.join(base_path, 'nse_logo.png')
+        except AttributeError:
+            icon_raw: requests.Response = requests.get(self.url_icon, headers=self.headers, stream=True)
+            with open('.NSE-OCA.png', 'wb') as f:
+                for chunk in icon_raw.iter_content(1024):
+                    f.write(chunk)
+            self.icon_path = '.NSE-OCA.png'
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
@@ -366,14 +373,16 @@ class Nse:
     def login_win(self, window: Tk) -> None:
         self.login: Tk = window
         self.login.title("NSE-Option-Chain-Analyzer")
-        self.login.protocol('WM_DELETE_WINDOW', lambda file='.NSE-OCA.png': os.remove(file) or self.login.destroy())
+        self.login.protocol('WM_DELETE_WINDOW', lambda file='.NSE-OCA.png': (os.remove(file)
+                                                                             if os.path.isfile(file)
+                                                                             else None) or self.login.destroy())
         window_width: int = self.login.winfo_reqwidth()
         window_height: int = self.login.winfo_reqheight()
         position_right: int = int(self.login.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
         self.login.geometry("320x160+{}+{}".format(position_right, position_down))
         self.login.resizable(False, False)
-        self.login.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
+        self.login.iconphoto(True, PhotoImage(file=self.icon_path))
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -719,7 +728,7 @@ class Nse:
         position_right: int = int(self.info.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
-        self.info.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
+        self.info.iconphoto(True, PhotoImage(file=self.icon_path))
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -774,7 +783,7 @@ class Nse:
             self.session.close()
             if self.logging:
                 print('----------Quitting Program----------')
-            os.remove('.NSE-OCA.png')
+            os.remove('.NSE-OCA.png') if os.path.isfile('.NSE-OCA.png') else None
             self.root.destroy()
             sys.exit()
         elif not ask_quit:
@@ -790,7 +799,7 @@ class Nse:
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
-        self.root.iconphoto(True, PhotoImage(file='.NSE-OCA.png'))
+        self.root.iconphoto(True, PhotoImage(file=self.icon_path))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
