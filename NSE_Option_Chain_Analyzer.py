@@ -1023,36 +1023,40 @@ class Nse:
             self.old_max_call_oi_sp = self.max_call_oi_sp
         else:
             if self.notifications:
-                self.toaster.show_toast("Upper Boundary Strike Price changed",
+                self.toaster.show_toast("Upper Boundary Strike Price changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp} to {self.max_call_oi_sp}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_max_call_oi_sp = self.max_call_oi_sp
 
         if self.first_run or self.old_max_call_oi_sp_2 == self.max_call_oi_sp_2:
             self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
         else:
             if self.notifications:
-                self.toaster.show_toast("Upper Boundary Strike Price 2 changed",
+                self.toaster.show_toast("Upper Boundary Strike Price 2 changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp_2} to {self.max_call_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
 
         if self.first_run or self.old_max_put_oi_sp == self.max_put_oi_sp:
             self.old_max_put_oi_sp = self.max_put_oi_sp
         else:
             if self.notifications:
-                self.toaster.show_toast("Lower Boundary Strike Price changed",
+                self.toaster.show_toast("Lower Boundary Strike Price changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp} to {self.max_put_oi_sp}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_max_put_oi_sp = self.max_put_oi_sp
 
         if self.first_run or self.old_max_put_oi_sp_2 == self.max_put_oi_sp_2:
             self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
         else:
             if self.notifications:
-                self.toaster.show_toast("Lower Boundary Strike Price 2 changed",
+                self.toaster.show_toast("Lower Boundary Strike Price 2 changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp_2} to {self.max_put_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
 
         red: str = "#e53935"
@@ -1076,8 +1080,10 @@ class Nse:
             self.old_oi_label = oi_label
         else:
             if self.notifications:
-                self.toaster.show_toast("Open Interest changed", f"Changed from {self.old_oi_label} to {oi_label}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                self.toaster.show_toast("Open Interest changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
+                                        f"Changed from {self.old_oi_label} to {oi_label}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_oi_label = oi_label
 
         if self.put_call_ratio >= 1:
@@ -1112,8 +1118,10 @@ class Nse:
             self.old_call_label = call
         else:
             if self.notifications:
-                self.toaster.show_toast("Call ITM changed", f"Changed from {self.old_call_label} to {call}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                self.toaster.show_toast("Call ITM changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
+                                        f"Changed from {self.old_call_label} to {call}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_call_label = call
 
         self.old_put_label: str
@@ -1128,8 +1136,10 @@ class Nse:
             self.old_put_label = put
         else:
             if self.notifications:
-                self.toaster.show_toast("Put ITM changed", f"Changed from {self.old_put_label} to {put}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                self.toaster.show_toast("Put ITM changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
+                                        f"Changed from {self.old_put_label} to {put}",
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_put_label = put
 
         self.old_call_exits_label: str
@@ -1150,9 +1160,10 @@ class Nse:
             self.old_call_exits_label = call_exits_label
         else:
             if self.notifications:
-                self.toaster.show_toast("Call Exits changed",
+                self.toaster.show_toast("Call Exits changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_call_exits_label} to {call_exits_label}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_call_exits_label = call_exits_label
 
         self.old_put_exits_label: str
@@ -1173,9 +1184,10 @@ class Nse:
             self.old_put_exits_label = put_exits_label
         else:
             if self.notifications:
-                self.toaster.show_toast("Put Exits changed",
+                self.toaster.show_toast("Put Exits changed "
+                                        f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_put_exits_label} to {put_exits_label}",
-                                        duration=4, threaded=True, icon_path='.NSE-OCA.png')
+                                        duration=4, threaded=True, icon_path=self.icon_path)
             self.old_put_exits_label = put_exits_label
 
         output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
