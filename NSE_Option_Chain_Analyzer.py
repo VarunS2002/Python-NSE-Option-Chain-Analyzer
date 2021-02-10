@@ -54,7 +54,7 @@ class Nse:
             'accept-encoding': 'gzip, deflate, br'}
         self.get_symbols()
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
-        self.create_config() if not os.path.isfile('NSE-OCA.ini') else None
+        self.create_config(new=True) if not os.path.isfile('NSE-OCA.ini') else None
         self.get_config()
         self.log() if self.logging else None
         self.units_str: str = 'in K' if self.option_mode == 'Index' else 'in 10s'
@@ -132,52 +132,118 @@ class Nse:
                                                                           f"Version: {Nse.version}")
                 self.info.attributes('-topmost', True)
 
-    def create_config(self, corrupted: bool = False) -> None:
-        if corrupted:
-            os.remove('NSE-OCA.ini')
-            self.config_parser = configparser.ConfigParser()
-
-        self.config_parser.read('NSE-OCA.ini')
-        self.config_parser.add_section('main')
-        self.config_parser.set('main', 'index', self.indices[0])
-        self.config_parser.set('main', 'stock', self.stocks[0])
-        self.config_parser.set('main', 'option_mode', 'Index')
-        self.config_parser.set('main', 'seconds', '60')
-        self.config_parser.set('main', 'live_export', 'False')
-        self.config_parser.set('main', 'save_oc', 'False')
-        self.config_parser.set('main', 'notifications', 'False')
-        self.config_parser.set('main', 'auto_stop', 'False')
-        self.config_parser.set('main', 'update', 'True')
-        self.config_parser.set('main', 'logging', 'False')
-
-        with open('NSE-OCA.ini', 'w') as f:
-            self.config_parser.write(f)
-
     def get_config(self) -> None:
         try:
             self.config_parser.read('NSE-OCA.ini')
-            self.index: str = self.config_parser.get('main', 'index')
-            self.stock: str = self.config_parser.get('main', 'stock')
-            self.option_mode: str = self.config_parser.get('main', 'option_mode')
-            self.seconds: int = self.config_parser.getint('main', 'seconds')
-            self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
-            self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
-            self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
-                if is_windows_10 else False
-            self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
-            self.update: bool = self.config_parser.getboolean('main', 'update')
-            self.logging: bool = self.config_parser.getboolean('main', 'logging')
-            if self.index not in self.indices:
-                raise ValueError(f'{self.index} is not a valid index')
-            if self.stock not in self.stocks:
-                raise ValueError(f'{self.stock} is not a valid stock')
-            if self.option_mode not in ('Index', 'Stock'):
-                raise ValueError(f'{self.option_mode} is not a valid option mode')
-        except (configparser.NoOptionError, configparser.NoSectionError, configparser.MissingSectionHeaderError,
-                configparser.DuplicateSectionError, configparser.DuplicateOptionError, ValueError) as err:
+            try:
+                self.index: str = self.config_parser.get('main', 'index')
+                if self.index not in self.indices:
+                    raise ValueError(f'{self.index} is not a valid index')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="index")
+                self.index: str = self.config_parser.get('main', 'index')
+            try:
+                self.stock: str = self.config_parser.get('main', 'stock')
+                if self.stock not in self.stocks:
+                    raise ValueError(f'{self.stock} is not a valid stock')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="stock")
+                self.stock: str = self.config_parser.get('main', 'stock')
+            try:
+                self.option_mode: str = self.config_parser.get('main', 'option_mode')
+                if self.option_mode not in ('Index', 'Stock'):
+                    raise ValueError(f'{self.option_mode} is not a valid option mode')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="option_mode")
+                self.option_mode: str = self.config_parser.get('main', 'option_mode')
+            try:
+                self.seconds: int = self.config_parser.getint('main', 'seconds')
+                if self.seconds not in (60, 120, 180, 300, 600, 900):
+                    raise ValueError(f'{self.seconds} is not a refresh interval')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="seconds")
+                self.seconds: int = self.config_parser.getint('main', 'seconds')
+            try:
+                self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="live_export")
+                self.live_export: bool = self.config_parser.getboolean('main', 'live_export')
+            try:
+                self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="save_oc")
+                self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
+            try:
+                self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
+                    if is_windows_10 else False
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="notifications")
+                self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
+                    if is_windows_10 else False
+            try:
+                self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="auto_stop")
+                self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
+            try:
+                self.update: bool = self.config_parser.getboolean('main', 'update')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="update")
+                self.update: bool = self.config_parser.getboolean('main', 'update')
+            try:
+                self.logging: bool = self.config_parser.getboolean('main', 'logging')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, "0")
+                self.create_config(attribute="logging")
+                self.logging: bool = self.config_parser.getboolean('main', 'logging')
+        except (configparser.NoSectionError, configparser.MissingSectionHeaderError,
+                configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
             print(err, "0")
-            self.create_config(True)
+            self.create_config(corrupted=True)
             return self.get_config()
+
+    def create_config(self, new: bool = False, corrupted: bool = False, attribute: Optional[str] = None) -> None:
+        if new or corrupted:
+            if corrupted:
+                os.remove('NSE-OCA.ini')
+                self.config_parser = configparser.ConfigParser()
+            self.config_parser.read('NSE-OCA.ini')
+            self.config_parser.add_section('main')
+            self.config_parser.set('main', 'index', self.indices[0])
+            self.config_parser.set('main', 'stock', self.stocks[0])
+            self.config_parser.set('main', 'option_mode', 'Index')
+            self.config_parser.set('main', 'seconds', '60')
+            self.config_parser.set('main', 'live_export', 'False')
+            self.config_parser.set('main', 'save_oc', 'False')
+            self.config_parser.set('main', 'notifications', 'False')
+            self.config_parser.set('main', 'auto_stop', 'False')
+            self.config_parser.set('main', 'update', 'True')
+            self.config_parser.set('main', 'logging', 'False')
+        elif attribute is not None:
+            if attribute == "index":
+                self.config_parser.set('main', 'index', self.indices[0])
+            elif attribute == "stock":
+                self.config_parser.set('main', 'stock', self.stocks[0])
+            elif attribute == "option_mode":
+                self.config_parser.set('main', 'option_mode', 'Index')
+            elif attribute == "seconds":
+                self.config_parser.set('main', 'seconds', '60')
+            elif attribute in ("live_export", "save_oc", "notifications", "auto_stop", "logging"):
+                self.config_parser.set('main', attribute, 'False')
+            elif attribute == "update":
+                self.config_parser.set('main', 'update', 'True')
+
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
     def get_data(self, event: Optional[Event] = None) -> Optional[Tuple[Optional[requests.Response], Any]]:
