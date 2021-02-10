@@ -1,4 +1,4 @@
-bs4>=0.0.1
+beautifulsoup4>=4.9.3
 numpy==1.19.3
 pandas>=1.1.4
 requests>=2.24.0
