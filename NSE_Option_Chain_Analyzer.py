@@ -45,8 +45,10 @@ class Nse:
         self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
         self.url_symbols: str = "https://www.nseindia.com/products-services/" \
                                 "equity-derivatives-list-underlyings-information"
-        self.url_icon: str = "https://raw.githubusercontent.com/VarunS2002/" \
-                             "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
+        self.url_icon_png: str = "https://raw.githubusercontent.com/VarunS2002/" \
+                                 "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
+        self.url_icon_ico: str = "https://raw.githubusercontent.com/VarunS2002/" \
+                                 "Python-NSE-Option-Chain-Analyzer/master/nse_logo.ico"
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) Chrome/80.0.3987.149 Safari/537.36',
@@ -101,17 +103,25 @@ class Nse:
                 column += 1
 
     def get_icon(self) -> None:
-        self.icon_path: str
+        self.icon_png_path: str
+        self.icon_ico_path: str
         try:
             # noinspection PyProtectedMember,PyUnresolvedReferences
             base_path: str = sys._MEIPASS
-            self.icon_path = os.path.join(base_path, 'nse_logo.png')
+            self.icon_png_path = os.path.join(base_path, 'nse_logo.png')
+            self.icon_ico_path = os.path.join(base_path, 'nse_logo.ico')
         except AttributeError:
-            icon_raw: requests.Response = requests.get(self.url_icon, headers=self.headers, stream=True)
+            icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
             with open('.NSE-OCA.png', 'wb') as f:
-                for chunk in icon_raw.iter_content(1024):
+                for chunk in icon_png_raw.iter_content(1024):
                     f.write(chunk)
-            self.icon_path = '.NSE-OCA.png'
+            self.icon_png_path = '.NSE-OCA.png'
+            if is_windows_10:
+                icon_ico_raw: requests.Response = requests.get(self.url_icon_ico, headers=self.headers, stream=True)
+                with open('.NSE-OCA.ico', 'wb') as f:
+                    for chunk in icon_ico_raw.iter_content(1024):
+                        f.write(chunk)
+                self.icon_ico_path = '.NSE-OCA.ico'
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
@@ -373,16 +383,14 @@ class Nse:
     def login_win(self, window: Tk) -> None:
         self.login: Tk = window
         self.login.title("NSE-Option-Chain-Analyzer")
-        self.login.protocol('WM_DELETE_WINDOW', lambda file='.NSE-OCA.png': (os.remove(file)
-                                                                             if os.path.isfile(file)
-                                                                             else None) or self.login.destroy())
+        self.login.protocol('WM_DELETE_WINDOW', self.close_login)
         window_width: int = self.login.winfo_reqwidth()
         window_height: int = self.login.winfo_reqheight()
         position_right: int = int(self.login.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
         self.login.geometry("320x160+{}+{}".format(position_right, position_down))
         self.login.resizable(False, False)
-        self.login.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.login.iconphoto(True, PhotoImage(file=self.icon_png_path))
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -728,7 +736,7 @@ class Nse:
         position_right: int = int(self.info.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
-        self.info.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.info.iconphoto(True, PhotoImage(file=self.icon_png_path))
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -775,8 +783,17 @@ class Nse:
         updates.grid(row=5, column=0, columnspan=2, sticky=N + S + W + E)
         self.info.mainloop()
 
+    def close_login(self) -> None:
+        self.session.close()
+        if self.logging:
+            print('----------Quitting Program----------')
+        os.remove('.NSE-OCA.png') if os.path.isfile('.NSE-OCA.png') else None
+        os.remove('.NSE-OCA.ico') if os.path.isfile('.NSE-OCA.ico') else None
+        self.login.destroy()
+        sys.exit()
+
     # noinspection PyUnusedLocal
-    def close(self, event: Optional[Event] = None) -> None:
+    def close_main(self, event: Optional[Event] = None) -> None:
         ask_quit: bool = messagebox.askyesno("Quit", "All unsaved data will be lost.\nProceed to quit?", icon='warning',
                                              default='no')
         if ask_quit:
@@ -784,6 +801,7 @@ class Nse:
             if self.logging:
                 print('----------Quitting Program----------')
             os.remove('.NSE-OCA.png') if os.path.isfile('.NSE-OCA.png') else None
+            os.remove('.NSE-OCA.ico') if os.path.isfile('.NSE-OCA.ico') else None
             self.root.destroy()
             sys.exit()
         elif not ask_quit:
@@ -793,13 +811,13 @@ class Nse:
         self.root: Tk = Tk()
         self.root.focus_force()
         self.root.title("NSE-Option-Chain-Analyzer")
-        self.root.protocol('WM_DELETE_WINDOW', self.close)
+        self.root.protocol('WM_DELETE_WINDOW', self.close_main)
         window_width: int = self.root.winfo_reqwidth()
         window_height: int = self.root.winfo_reqheight()
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
-        self.root.iconphoto(True, PhotoImage(file=self.icon_path))
+        self.root.iconphoto(True, PhotoImage(file=self.icon_png_path))
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -822,7 +840,7 @@ class Nse:
         self.options.add_command(label=f"Debug Logging: {'On' if self.logging else 'Off'}", accelerator="(Ctrl+L)",
                                  command=self.log)
         self.options.add_command(label="About", accelerator="(Ctrl+M)", command=self.about)
-        self.options.add_command(label="Quit", accelerator="(Ctrl+Q)", command=self.close)
+        self.options.add_command(label="Quit", accelerator="(Ctrl+Q)", command=self.close_main)
         menubar.add_cascade(label="Menu", menu=self.options)
         self.root.config(menu=menubar)
 
@@ -835,7 +853,7 @@ class Nse:
         self.root.bind('<Control-u>', self.toggle_updates)
         self.root.bind('<Control-l>', self.log)
         self.root.bind('<Control-m>', self.about)
-        self.root.bind('<Control-q>', self.close)
+        self.root.bind('<Control-q>', self.close_main)
 
         top_frame: Frame = Frame(self.root)
         top_frame.rowconfigure(0, weight=1)
@@ -1026,7 +1044,7 @@ class Nse:
                 self.toaster.show_toast("Upper Boundary Strike Price changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp} to {self.max_call_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_max_call_oi_sp = self.max_call_oi_sp
 
         if self.first_run or self.old_max_call_oi_sp_2 == self.max_call_oi_sp_2:
@@ -1036,7 +1054,7 @@ class Nse:
                 self.toaster.show_toast("Upper Boundary Strike Price 2 changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp_2} to {self.max_call_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
 
         if self.first_run or self.old_max_put_oi_sp == self.max_put_oi_sp:
@@ -1046,7 +1064,7 @@ class Nse:
                 self.toaster.show_toast("Lower Boundary Strike Price changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp} to {self.max_put_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_max_put_oi_sp = self.max_put_oi_sp
 
         if self.first_run or self.old_max_put_oi_sp_2 == self.max_put_oi_sp_2:
@@ -1056,7 +1074,7 @@ class Nse:
                 self.toaster.show_toast("Lower Boundary Strike Price 2 changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp_2} to {self.max_put_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
 
         red: str = "#e53935"
@@ -1083,7 +1101,7 @@ class Nse:
                 self.toaster.show_toast("Open Interest changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_oi_label} to {oi_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_oi_label = oi_label
 
         if self.put_call_ratio >= 1:
@@ -1121,7 +1139,7 @@ class Nse:
                 self.toaster.show_toast("Call ITM changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_call_label} to {call}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_call_label = call
 
         self.old_put_label: str
@@ -1139,7 +1157,7 @@ class Nse:
                 self.toaster.show_toast("Put ITM changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_put_label} to {put}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_put_label = put
 
         self.old_call_exits_label: str
@@ -1163,7 +1181,7 @@ class Nse:
                 self.toaster.show_toast("Call Exits changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_call_exits_label} to {call_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_call_exits_label = call_exits_label
 
         self.old_put_exits_label: str
@@ -1187,7 +1205,7 @@ class Nse:
                 self.toaster.show_toast("Put Exits changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_put_exits_label} to {put_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_path)
+                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
             self.old_put_exits_label = put_exits_label
 
         output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
