@@ -736,6 +736,7 @@ class Nse:
         position_right: int = int(self.info.winfo_screenwidth() / 2 - window_width / 2)
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
+        self.info.resizable(False, False)
         self.info.iconphoto(True, PhotoImage(file=self.icon_png_path))
         self.info.attributes('-topmost', True)
         self.info.grab_set()
