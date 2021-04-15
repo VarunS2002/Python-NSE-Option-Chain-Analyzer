@@ -30,7 +30,6 @@ class Nse:
     version: str = '5.2'
 
     def __init__(self, window: Tk) -> None:
-        self.load_nse_icon: bool = True
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
         self.stdout: TextIO = sys.stdout
         self.stderr: TextIO = sys.stderr
@@ -156,6 +155,12 @@ class Nse:
         try:
             self.config_parser.read('NSE-OCA.ini')
             try:
+                self.load_nse_icon: bool = self.config_parser.getboolean('main', 'load_nse_icon')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, sys.exc_info()[0], "0")
+                self.create_config(attribute="load_nse_icon")
+                self.load_nse_icon: bool = self.config_parser.getboolean('main', 'load_nse_icon')
+            try:
                 self.index: str = self.config_parser.get('main', 'index')
                 if self.index not in self.indices:
                     raise ValueError(f'{self.index} is not a valid index')
@@ -238,6 +243,7 @@ class Nse:
                 self.config_parser = configparser.ConfigParser()
             self.config_parser.read('NSE-OCA.ini')
             self.config_parser.add_section('main')
+            self.config_parser.set('main', 'load_nse_icon', 'True')
             self.config_parser.set('main', 'index', self.indices[0])
             self.config_parser.set('main', 'stock', self.stocks[0])
             self.config_parser.set('main', 'option_mode', 'Index')
@@ -249,7 +255,9 @@ class Nse:
             self.config_parser.set('main', 'update', 'True')
             self.config_parser.set('main', 'logging', 'False')
         elif attribute is not None:
-            if attribute == "index":
+            if attribute == "load_nse_icon":
+                self.config_parser.set('main', 'load_nse_icon', 'True')
+            elif attribute == "index":
                 self.config_parser.set('main', 'index', self.indices[0])
             elif attribute == "stock":
                 self.config_parser.set('main', 'stock', self.stocks[0])
