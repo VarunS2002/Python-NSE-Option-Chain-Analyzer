@@ -30,6 +30,7 @@ class Nse:
     version: str = '5.2'
 
     def __init__(self, window: Tk) -> None:
+        self.load_nse_icon: bool = True
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
         self.stdout: TextIO = sys.stdout
         self.stderr: TextIO = sys.stderr
@@ -110,18 +111,20 @@ class Nse:
             base_path: str = sys._MEIPASS
             self.icon_png_path = os.path.join(base_path, 'nse_logo.png')
             self.icon_ico_path = os.path.join(base_path, 'nse_logo.ico')
+            self.load_nse_icon = True if not self.load_nse_icon else None
         except AttributeError:
-            icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
-            with open('.NSE-OCA.png', 'wb') as f:
-                for chunk in icon_png_raw.iter_content(1024):
-                    f.write(chunk)
-            self.icon_png_path = '.NSE-OCA.png'
-            if is_windows_10:
-                icon_ico_raw: requests.Response = requests.get(self.url_icon_ico, headers=self.headers, stream=True)
-                with open('.NSE-OCA.ico', 'wb') as f:
-                    for chunk in icon_ico_raw.iter_content(1024):
+            if self.load_nse_icon:
+                icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
+                with open('.NSE-OCA.png', 'wb') as f:
+                    for chunk in icon_png_raw.iter_content(1024):
                         f.write(chunk)
-                self.icon_ico_path = '.NSE-OCA.ico'
+                self.icon_png_path = '.NSE-OCA.png'
+                if is_windows_10:
+                    icon_ico_raw: requests.Response = requests.get(self.url_icon_ico, headers=self.headers, stream=True)
+                    with open('.NSE-OCA.ico', 'wb') as f:
+                        for chunk in icon_ico_raw.iter_content(1024):
+                            f.write(chunk)
+                    self.icon_ico_path = '.NSE-OCA.ico'
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
@@ -390,7 +393,7 @@ class Nse:
         position_down: int = int(self.login.winfo_screenheight() / 2 - window_height / 2)
         self.login.geometry("320x160+{}+{}".format(position_right, position_down))
         self.login.resizable(False, False)
-        self.login.iconphoto(True, PhotoImage(file=self.icon_png_path))
+        self.login.iconphoto(True, PhotoImage(file=self.icon_png_path)) if self.load_nse_icon else None
         self.login.rowconfigure(0, weight=1)
         self.login.rowconfigure(1, weight=1)
         self.login.rowconfigure(2, weight=1)
@@ -692,6 +695,8 @@ class Nse:
                 print(platform.system() + ' ' + platform.release() + ' .exe version ' + Nse.version)
             except AttributeError:
                 print(platform.system() + ' ' + platform.release() + ' .py version ' + Nse.version)
+                if not self.load_nse_icon:
+                    print("NSE icon loading disabled")
 
             try:
                 self.options.entryconfig(self.options.index(8), label="Debug Logging: On")
@@ -737,7 +742,7 @@ class Nse:
         position_down: int = int(self.info.winfo_screenheight() / 2 - window_height / 2)
         self.info.geometry("250x150+{}+{}".format(position_right, position_down))
         self.info.resizable(False, False)
-        self.info.iconphoto(True, PhotoImage(file=self.icon_png_path))
+        self.info.iconphoto(True, PhotoImage(file=self.icon_png_path)) if self.load_nse_icon else None
         self.info.attributes('-topmost', True)
         self.info.grab_set()
         self.info.focus_force()
@@ -818,7 +823,7 @@ class Nse:
         position_right: int = int(self.root.winfo_screenwidth() / 3 - window_width / 2)
         position_down: int = int(self.root.winfo_screenheight() / 3 - window_height / 2)
         self.root.geometry("815x560+{}+{}".format(position_right, position_down))
-        self.root.iconphoto(True, PhotoImage(file=self.icon_png_path))
+        self.root.iconphoto(True, PhotoImage(file=self.icon_png_path)) if self.load_nse_icon else None
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -1045,7 +1050,8 @@ class Nse:
                 self.toaster.show_toast("Upper Boundary Strike Price changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp} to {self.max_call_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_max_call_oi_sp = self.max_call_oi_sp
 
         if self.first_run or self.old_max_call_oi_sp_2 == self.max_call_oi_sp_2:
@@ -1055,7 +1061,8 @@ class Nse:
                 self.toaster.show_toast("Upper Boundary Strike Price 2 changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_call_oi_sp_2} to {self.max_call_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_max_call_oi_sp_2 = self.max_call_oi_sp_2
 
         if self.first_run or self.old_max_put_oi_sp == self.max_put_oi_sp:
@@ -1065,7 +1072,8 @@ class Nse:
                 self.toaster.show_toast("Lower Boundary Strike Price changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp} to {self.max_put_oi_sp}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_max_put_oi_sp = self.max_put_oi_sp
 
         if self.first_run or self.old_max_put_oi_sp_2 == self.max_put_oi_sp_2:
@@ -1075,7 +1083,8 @@ class Nse:
                 self.toaster.show_toast("Lower Boundary Strike Price 2 changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_max_put_oi_sp_2} to {self.max_put_oi_sp_2}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_max_put_oi_sp_2 = self.max_put_oi_sp_2
 
         red: str = "#e53935"
@@ -1102,7 +1111,8 @@ class Nse:
                 self.toaster.show_toast("Open Interest changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_oi_label} to {oi_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_oi_label = oi_label
 
         if self.put_call_ratio >= 1:
@@ -1140,7 +1150,8 @@ class Nse:
                 self.toaster.show_toast("Call ITM changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_call_label} to {call}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_call_label = call
 
         self.old_put_label: str
@@ -1158,7 +1169,8 @@ class Nse:
                 self.toaster.show_toast("Put ITM changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_put_label} to {put}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_put_label = put
 
         self.old_call_exits_label: str
@@ -1182,7 +1194,8 @@ class Nse:
                 self.toaster.show_toast("Call Exits changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_call_exits_label} to {call_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_call_exits_label = call_exits_label
 
         self.old_put_exits_label: str
@@ -1206,7 +1219,8 @@ class Nse:
                 self.toaster.show_toast("Put Exits changed "
                                         f"for {self.index if self.option_mode == 'Index' else self.stock}",
                                         f"Changed from {self.old_put_exits_label} to {put_exits_label}",
-                                        duration=4, threaded=True, icon_path=self.icon_ico_path)
+                                        duration=4, threaded=True,
+                                        icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_put_exits_label = put_exits_label
 
         output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
