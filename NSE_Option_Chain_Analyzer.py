@@ -35,6 +35,7 @@ class Nse:
         self.stderr: TextIO = sys.stderr
         self.previous_date: Optional[datetime.date] = None
         self.previous_time: Optional[datetime.time] = None
+        self.time_difference_factor: int = 5
         self.first_run: bool = True
         self.stop: bool = False
         self.dates: List[str] = [""]
@@ -230,6 +231,12 @@ class Nse:
                 print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="logging")
                 self.logging: bool = self.config_parser.getboolean('main', 'logging')
+            try:
+                self.warn_late_update: bool = self.config_parser.getboolean('main', 'warn_late_update')
+            except (configparser.NoOptionError, ValueError) as err:
+                print(err, sys.exc_info()[0], "0")
+                self.create_config(attribute="warn_late_update")
+                self.warn_late_update: bool = self.config_parser.getboolean('main', 'warn_late_update')
         except (configparser.NoSectionError, configparser.MissingSectionHeaderError,
                 configparser.DuplicateSectionError, configparser.DuplicateOptionError) as err:
             print(err, sys.exc_info()[0], "0")
@@ -254,6 +261,7 @@ class Nse:
             self.config_parser.set('main', 'auto_stop', 'False')
             self.config_parser.set('main', 'update', 'True')
             self.config_parser.set('main', 'logging', 'False')
+            self.config_parser.set('main', 'warn_late_update', 'False')
         elif attribute is not None:
             if attribute == "load_nse_icon":
                 self.config_parser.set('main', 'load_nse_icon', 'True')
@@ -269,6 +277,8 @@ class Nse:
                 self.config_parser.set('main', attribute, 'False')
             elif attribute == "update":
                 self.config_parser.set('main', 'update', 'True')
+            elif attribute == "warn_late_update":
+                self.config_parser.set('main', 'warn_late_update', 'False')
 
         with open('NSE-OCA.ini', 'w') as f:
             self.config_parser.write(f)
@@ -673,15 +683,32 @@ class Nse:
             self.config_parser.write(f)
 
     # noinspection PyUnusedLocal
+    def toggle_warn_late_update(self, event: Optional[Event] = None) -> None:
+        if self.warn_late_update:
+            self.warn_late_update = False
+            self.options.entryconfig(self.options.index(6), label="Warn Late Server Updates: Off")
+            messagebox.showinfo(title="Warn Late Server Updates Disabled",
+                                message="Program will not alert you if the server updates late.")
+        else:
+            self.warn_late_update = True
+            self.options.entryconfig(self.options.index(6), label="Warn Late Server Updates: On")
+            messagebox.showinfo(title="Warn Late Server Updates Enabled",
+                                message="Program will alert you if the server update time is 5 minutes or more.")
+
+        self.config_parser.set('main', 'warn_late_update', f'{self.warn_late_update}')
+        with open('NSE-OCA.ini', 'w') as f:
+            self.config_parser.write(f)
+
+    # noinspection PyUnusedLocal
     def toggle_updates(self, event: Optional[Event] = None) -> None:
         if self.update:
             self.update = False
-            self.options.entryconfig(self.options.index(7), label="Auto Check for Updates: Off")
+            self.options.entryconfig(self.options.index(8), label="Auto Check for Updates: Off")
             messagebox.showinfo(title="Auto Checking for Updates Disabled",
                                 message="Program will not check for updates at start.")
         else:
             self.update = True
-            self.options.entryconfig(self.options.index(7), label="Auto Check for Updates: On")
+            self.options.entryconfig(self.options.index(8), label="Auto Check for Updates: On")
             messagebox.showinfo(title="Auto Checking for Updates Enabled",
                                 message="Program will check for updates at start.")
 
@@ -707,7 +734,7 @@ class Nse:
                     print("NSE icon loading disabled")
 
             try:
-                self.options.entryconfig(self.options.index(8), label="Debug Logging: On")
+                self.options.entryconfig(self.options.index(9), label="Debug Logging: On")
                 messagebox.showinfo(title="Debug Logging Enabled",
                                     message="Errors will be logged to NSE-OCA.log.")
             except AttributeError:
@@ -718,7 +745,7 @@ class Nse:
             sys.stderr = self.stderr
             streamtologger._is_redirected = False
             self.logging = False
-            self.options.entryconfig(self.options.index(8), label="Debug Logging: Off")
+            self.options.entryconfig(self.options.index(9), label="Debug Logging: Off")
             messagebox.showinfo(title="Debug Logging Disabled", message="Errors will not be logged.")
 
         self.config_parser.set('main', 'logging', f'{self.logging}')
@@ -848,6 +875,8 @@ class Nse:
                                  state=NORMAL if is_windows_10 else DISABLED)
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
                                  accelerator="(Ctrl+K)", command=self.toggle_auto_stop)
+        self.options.add_command(label=f"Warn Late Server Updates: {'On' if self.warn_late_update else 'Off'}",
+                                 accelerator="(Ctrl+W)", command=self.toggle_warn_late_update)
         self.options.add_separator()
         self.options.add_command(label=f"Auto Check for Updates: {'On' if self.update else 'Off'}",
                                  accelerator="(Ctrl+U)", command=self.toggle_updates)
@@ -864,6 +893,7 @@ class Nse:
         self.root.bind('<Control-o>', self.toggle_save_oc)
         self.root.bind('<Control-n>', self.toggle_notifications) if is_windows_10 else None
         self.root.bind('<Control-k>', self.toggle_auto_stop)
+        self.root.bind('<Control-w>', self.toggle_warn_late_update)
         self.root.bind('<Control-u>', self.toggle_updates)
         self.root.bind('<Control-l>', self.log)
         self.root.bind('<Control-m>', self.about)
@@ -1343,6 +1373,16 @@ class Nse:
             self.previous_time = current_time
         elif current_date == self.previous_date:
             if current_time > self.previous_time:
+                time_difference: float = 0
+                if current_time.hour > self.previous_time.hour:
+                    time_difference = (60 - self.previous_time.minute) + current_time.minute + \
+                                      ((60 - self.previous_time.second) + current_time.second) / 60
+                elif current_time.hour == self.previous_time.hour:
+                    time_difference = current_time.minute - self.previous_time.minute + \
+                                      (current_time.second - self.previous_time.second) / 60
+                if time_difference >= self.time_difference_factor and self.warn_late_update:
+                    messagebox.showinfo(title="Late Update", message=f"The data from the server was last updated about "
+                                                                     f"{time_difference} minutes ago.")
                 self.previous_time = current_time
             else:
                 self.root.after((self.seconds * 1000), self.main)
