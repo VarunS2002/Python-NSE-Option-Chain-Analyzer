@@ -1466,8 +1466,10 @@ class Nse:
         b3: pandas.Series = entire_oc.iloc[:, 1]
         c3: numpy.int64 = b3.get((index + 2), 'Change in Open Interest')
         if isinstance(c2, str):
+            # noinspection PyTypeChecker
             c2 = 0
         if isinstance(c3, str):
+            # noinspection PyTypeChecker
             c3 = 0
         self.call_sum: numpy.float64 = round((c1 + c2 + c3) / self.round_factor, 1)
         if self.call_sum == -0:
@@ -1485,8 +1487,10 @@ class Nse:
         self.p6: numpy.int64 = o3.get((index - 2), 'Change in Open Interest')
         self.p7: numpy.int64 = o2.get((index - 2), 'Change in Open Interest')
         if isinstance(p2, str):
+            # noinspection PyTypeChecker
             p2 = 0
         if isinstance(p3, str):
+            # noinspection PyTypeChecker
             p3 = 0
         if isinstance(self.p4, str):
             self.p4 = 0
