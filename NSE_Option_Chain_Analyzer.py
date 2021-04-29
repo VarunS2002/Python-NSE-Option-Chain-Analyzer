@@ -1382,7 +1382,7 @@ class Nse:
                                       (current_time.second - self.previous_time.second) / 60
                 if time_difference >= self.time_difference_factor and self.warn_late_update:
                     messagebox.showinfo(title="Late Update", message=f"The data from the server was last updated about "
-                                                                     f"{time_difference} minutes ago.")
+                                                                     f"{int(time_difference)} minutes ago.")
                 self.previous_time = current_time
             else:
                 self.root.after((self.seconds * 1000), self.main)
