@@ -111,7 +111,7 @@ class Nse:
             base_path: str = sys._MEIPASS
             self.icon_png_path = os.path.join(base_path, 'nse_logo.png')
             self.icon_ico_path = os.path.join(base_path, 'nse_logo.ico')
-            self.load_nse_icon = True if not self.load_nse_icon else None
+            self.load_nse_icon = True
         except AttributeError:
             if self.load_nse_icon:
                 icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
