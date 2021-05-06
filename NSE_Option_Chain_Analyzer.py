@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 12)
+    beta: Tuple[bool, int] = (True, 13)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -76,9 +76,17 @@ class Nse:
         self.login_win(window)
 
     def get_symbols(self) -> None:
-        symbols_information: requests.Response = requests.get(self.url_symbols, headers=self.headers)
+        try:
+            symbols_information: requests.Response = requests.get(self.url_symbols, headers=self.headers)
+        except Exception as err:
+            print(err, sys.exc_info()[0], "19")
+            sys.exit()
         symbols_information_soup: bs4.BeautifulSoup = bs4.BeautifulSoup(symbols_information.content, "html.parser")
-        symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
+        try:
+            symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
+        except IndexError as err:
+            print(err, sys.exc_info()[0], "20")
+            sys.exit()
         symbols_table_rows: List[bs4.element.Tag] = list(symbols_table.findChildren(['th', 'tr']))
         symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows) - 1)]
         for column in range(len(symbols_table_rows) - 1):
