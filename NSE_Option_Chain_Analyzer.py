@@ -12,7 +12,6 @@ from tkinter.ttk import Combobox, Button
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
 
 import bs4
-import numpy
 import pandas
 import requests
 import streamtologger
@@ -573,7 +572,7 @@ class Nse:
             messagebox.showerror(title="Export Failed",
                                  message="An error occurred while exporting the data.")
 
-    def export_row(self, values: Optional[List[Union[str, float, numpy.float64]]]) -> None:
+    def export_row(self, values: Optional[List[Union[str, float]]]) -> None:
         if values is None:
             csv_exists: bool = os.path.isfile(
                 f"NSE-OCA-{self.index if self.option_mode == 'Index' else self.stock}-{self.expiry_date}.csv")
@@ -1067,10 +1066,10 @@ class Nse:
             self.root.title(f"NSE-Option-Chain-Analyzer - {self.index if self.option_mode == 'Index' else self.stock} "
                             f"- {self.expiry_date} - {self.sp}")
 
-        self.old_max_call_oi_sp: numpy.float64
-        self.old_max_call_oi_sp_2: numpy.float64
-        self.old_max_put_oi_sp: numpy.float64
-        self.old_max_put_oi_sp_2: numpy.float64
+        self.old_max_call_oi_sp: float
+        self.old_max_call_oi_sp_2: float
+        self.old_max_put_oi_sp: float
+        self.old_max_put_oi_sp_2: float
 
         self.max_call_oi_val.config(text=self.max_call_oi)
         self.max_call_oi_sp_val.config(text=self.max_call_oi_sp)
@@ -1261,10 +1260,10 @@ class Nse:
                                         icon_path=self.icon_ico_path if self.load_nse_icon else None)
             self.old_put_exits_label = put_exits_label
 
-        output_values: List[Union[str, float, numpy.float64]] = [self.str_current_time, self.points, self.call_sum,
-                                                                 self.put_sum, self.difference,
-                                                                 self.call_boundary, self.put_boundary, self.call_itm,
-                                                                 self.put_itm]
+        output_values: List[Union[str, float]] = [self.str_current_time, self.points, self.call_sum,
+                                                  self.put_sum, self.difference,
+                                                  self.call_boundary, self.put_boundary, self.call_itm,
+                                                  self.put_itm]
         self.sheet.insert_row(values=output_values)
         if self.live_export:
             self.export_row(output_values)
@@ -1280,7 +1279,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=1, bg=red)
             self.old_points = self.points
-        self.old_call_sum: numpy.float64
+        self.old_call_sum: float
         if self.first_run or self.old_call_sum == self.call_sum:
             self.old_call_sum = self.call_sum
         elif self.call_sum > self.old_call_sum:
@@ -1289,7 +1288,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=2, bg=green)
             self.old_call_sum = self.call_sum
-        self.old_put_sum: numpy.float64
+        self.old_put_sum: float
         if self.first_run or self.old_put_sum == self.put_sum:
             self.old_put_sum = self.put_sum
         elif self.put_sum > self.old_put_sum:
@@ -1307,7 +1306,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=4, bg=green)
             self.old_difference = self.difference
-        self.old_call_boundary: numpy.float64
+        self.old_call_boundary: float
         if self.first_run or self.old_call_boundary == self.call_boundary:
             self.old_call_boundary = self.call_boundary
         elif self.call_boundary > self.old_call_boundary:
@@ -1316,7 +1315,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=5, bg=green)
             self.old_call_boundary = self.call_boundary
-        self.old_put_boundary: numpy.float64
+        self.old_put_boundary: float
         if self.first_run or self.old_put_boundary == self.put_boundary:
             self.old_put_boundary = self.put_boundary
         elif self.put_boundary > self.old_put_boundary:
@@ -1325,7 +1324,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=6, bg=red)
             self.old_put_boundary = self.put_boundary
-        self.old_call_itm: numpy.float64
+        self.old_call_itm: float
         if self.first_run or self.old_call_itm == self.call_itm:
             self.old_call_itm = self.call_itm
         elif self.call_itm > self.old_call_itm:
@@ -1334,7 +1333,7 @@ class Nse:
         else:
             self.sheet.highlight_cells(row=last_row, column=7, bg=red)
             self.old_call_itm = self.call_itm
-        self.old_put_itm: numpy.float64
+        self.old_put_itm: float
         if self.first_run or self.old_put_itm == self.put_itm:
             self.old_put_itm = self.put_itm
         elif self.put_itm > self.old_put_itm:
@@ -1396,7 +1395,7 @@ class Nse:
             call_oi_list.append(int_call_oi)
         call_oi_index: int = call_oi_list.index(max(call_oi_list))
         self.max_call_oi: float = round(max(call_oi_list) / self.round_factor, 1)
-        self.max_call_oi_sp: numpy.float64 = entire_oc.iloc[call_oi_index]['Strike Price']
+        self.max_call_oi_sp: float = float(entire_oc.iloc[call_oi_index]['Strike Price'])
 
         put_oi_list: List[int] = []
         for i in range(len(entire_oc)):
@@ -1404,16 +1403,16 @@ class Nse:
             put_oi_list.append(int_put_oi)
         put_oi_index: int = put_oi_list.index(max(put_oi_list))
         self.max_put_oi: float = round(max(put_oi_list) / self.round_factor, 1)
-        self.max_put_oi_sp: numpy.float64 = entire_oc.iloc[put_oi_index]['Strike Price']
+        self.max_put_oi_sp: float = float(entire_oc.iloc[put_oi_index]['Strike Price'])
 
-        sp_range_list: List[numpy.float64] = []
+        sp_range_list: List[float] = []
         for i in range(put_oi_index, call_oi_index + 1):
-            sp_range_list.append(entire_oc.iloc[i]['Strike Price'])
+            sp_range_list.append(float(entire_oc.iloc[i]['Strike Price']))
 
         self.max_call_oi_2: float
-        self.max_call_oi_sp_2: numpy.float64
+        self.max_call_oi_sp_2: float
         self.max_put_oi_2: float
-        self.max_put_oi_sp_2: numpy.float64
+        self.max_put_oi_sp_2: float
         if self.max_call_oi_sp == self.max_put_oi_sp:
             self.max_call_oi_2 = self.max_call_oi
             self.max_call_oi_sp_2 = self.max_call_oi_sp
@@ -1433,7 +1432,7 @@ class Nse:
                 call_oi_list_2.append(int_call_oi_2)
             call_oi_index_2: int = put_oi_index + call_oi_list_2.index(max(call_oi_list_2))
             self.max_call_oi_2 = round(max(call_oi_list_2) / self.round_factor, 1)
-            self.max_call_oi_sp_2 = entire_oc.iloc[call_oi_index_2]['Strike Price']
+            self.max_call_oi_sp_2 = float(entire_oc.iloc[call_oi_index_2]['Strike Price'])
 
             put_oi_list_2: List[int] = []
             for i in range(put_oi_index + 1, call_oi_index + 1):
@@ -1441,7 +1440,7 @@ class Nse:
                 put_oi_list_2.append(int_put_oi_2)
             put_oi_index_2: int = put_oi_index + 1 + put_oi_list_2.index(max(put_oi_list_2))
             self.max_put_oi_2 = round(max(put_oi_list_2) / self.round_factor, 1)
-            self.max_put_oi_sp_2 = entire_oc.iloc[put_oi_index_2]['Strike Price']
+            self.max_put_oi_sp_2 = float(entire_oc.iloc[put_oi_index_2]['Strike Price'])
 
         total_call_oi: int = sum(call_oi_list)
         total_put_oi: int = sum(put_oi_list)
@@ -1462,46 +1461,42 @@ class Nse:
 
         a: pandas.DataFrame = entire_oc[['Change in Open Interest']][entire_oc['Strike Price'] == self.sp]
         b1: pandas.Series = a.iloc[:, 0]
-        c1: numpy.int64 = b1.get(index)
+        c1: int = int(b1.get(index))
         b2: pandas.Series = entire_oc.iloc[:, 1]
-        c2: numpy.int64 = b2.get((index + 1), 'Change in Open Interest')
+        c2: int = int(b2.get((index + 1), 'Change in Open Interest'))
         b3: pandas.Series = entire_oc.iloc[:, 1]
-        c3: numpy.int64 = b3.get((index + 2), 'Change in Open Interest')
+        c3: int = int(b3.get((index + 2), 'Change in Open Interest'))
         if isinstance(c2, str):
-            # noinspection PyTypeChecker
             c2 = 0
         if isinstance(c3, str):
-            # noinspection PyTypeChecker
             c3 = 0
-        self.call_sum: numpy.float64 = round((c1 + c2 + c3) / self.round_factor, 1)
+        self.call_sum: float = round((c1 + c2 + c3) / self.round_factor, 1)
         if self.call_sum == -0:
             self.call_sum = 0.0
-        self.call_boundary: numpy.float64 = round(c3 / self.round_factor, 1)
+        self.call_boundary: float = round(c3 / self.round_factor, 1)
 
         o1: pandas.Series = a.iloc[:, 1]
-        p1: numpy.int64 = o1.get(index)
+        p1: int = int(o1.get(index))
         o2: pandas.Series = entire_oc.iloc[:, 19]
-        p2: numpy.int64 = o2.get((index + 1), 'Change in Open Interest')
-        p3: numpy.int64 = o2.get((index + 2), 'Change in Open Interest')
-        self.p4: numpy.int64 = o2.get((index + 4), 'Change in Open Interest')
+        p2: int = int(o2.get((index + 1), 'Change in Open Interest'))
+        p3: int = int(o2.get((index + 2), 'Change in Open Interest'))
+        self.p4: int = int(o2.get((index + 4), 'Change in Open Interest'))
         o3: pandas.Series = entire_oc.iloc[:, 1]
-        self.p5: numpy.int64 = o3.get((index + 4), 'Change in Open Interest')
-        self.p6: numpy.int64 = o3.get((index - 2), 'Change in Open Interest')
-        self.p7: numpy.int64 = o2.get((index - 2), 'Change in Open Interest')
+        self.p5: int = int(o3.get((index + 4), 'Change in Open Interest'))
+        self.p6: int = int(o3.get((index - 2), 'Change in Open Interest'))
+        self.p7: int = int(o2.get((index - 2), 'Change in Open Interest'))
         if isinstance(p2, str):
-            # noinspection PyTypeChecker
             p2 = 0
         if isinstance(p3, str):
-            # noinspection PyTypeChecker
             p3 = 0
         if isinstance(self.p4, str):
             self.p4 = 0
         if isinstance(self.p5, str):
             self.p5 = 0
-        self.put_sum: numpy.float64 = round((p1 + p2 + p3) / self.round_factor, 1)
-        self.put_boundary: numpy.float64 = round(p1 / self.round_factor, 1)
-        self.difference: float = float(round(self.call_sum - self.put_sum, 1))
-        self.call_itm: numpy.float64
+        self.put_sum: float = round((p1 + p2 + p3) / self.round_factor, 1)
+        self.put_boundary: float = round(p1 / self.round_factor, 1)
+        self.difference: float = round(self.call_sum - self.put_sum, 1)
+        self.call_itm: float
         if self.p5 == 0:
             self.call_itm = 0.0
         else:
@@ -1512,7 +1507,7 @@ class Nse:
             self.p6 = 0
         if isinstance(self.p7, str):
             self.p7 = 0
-        self.put_itm: numpy.float64
+        self.put_itm: float
         if self.p7 == 0:
             self.put_itm = 0.0
         else:
