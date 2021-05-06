@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 11)
+    beta: Tuple[bool, int] = (True, 12)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -115,11 +115,7 @@ class Nse:
         except AttributeError:
             if self.load_nse_icon:
                 try:
-                    icon_png_raw: Optional[requests.Response] = requests.get(self.url_icon_png, headers=self.headers,
-                                                                             stream=True)
-                    if icon_png_raw is None:
-                        self.load_nse_icon = False
-                        return
+                    icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
                     with open('.NSE-OCA.png', 'wb') as f:
                         for chunk in icon_png_raw.iter_content(1024):
                             f.write(chunk)
@@ -131,11 +127,8 @@ class Nse:
                     return
                 if is_windows_10:
                     try:
-                        icon_ico_raw: Optional[requests.Response] = requests.get(self.url_icon_ico,
-                                                                                 headers=self.headers, stream=True)
-                        if icon_ico_raw is None:
-                            self.icon_ico_path = None
-                            return
+                        icon_ico_raw: requests.Response = requests.get(self.url_icon_ico,
+                                                                       headers=self.headers, stream=True)
                         with open('.NSE-OCA.ico', 'wb') as f:
                             for chunk in icon_ico_raw.iter_content(1024):
                                 f.write(chunk)
