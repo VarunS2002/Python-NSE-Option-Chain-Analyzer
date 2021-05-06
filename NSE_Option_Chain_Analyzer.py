@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 10)
+    beta: Tuple[bool, int] = (True, 11)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -114,17 +114,36 @@ class Nse:
             self.load_nse_icon = True
         except AttributeError:
             if self.load_nse_icon:
-                icon_png_raw: requests.Response = requests.get(self.url_icon_png, headers=self.headers, stream=True)
-                with open('.NSE-OCA.png', 'wb') as f:
-                    for chunk in icon_png_raw.iter_content(1024):
-                        f.write(chunk)
-                self.icon_png_path = '.NSE-OCA.png'
-                if is_windows_10:
-                    icon_ico_raw: requests.Response = requests.get(self.url_icon_ico, headers=self.headers, stream=True)
-                    with open('.NSE-OCA.ico', 'wb') as f:
-                        for chunk in icon_ico_raw.iter_content(1024):
+                try:
+                    icon_png_raw: Optional[requests.Response] = requests.get(self.url_icon_png, headers=self.headers,
+                                                                             stream=True)
+                    if icon_png_raw is None:
+                        self.load_nse_icon = False
+                        return
+                    with open('.NSE-OCA.png', 'wb') as f:
+                        for chunk in icon_png_raw.iter_content(1024):
                             f.write(chunk)
-                    self.icon_ico_path = '.NSE-OCA.ico'
+                    self.icon_png_path = '.NSE-OCA.png'
+                    PhotoImage(file=self.icon_png_path)
+                except Exception as err:
+                    print(err, sys.exc_info()[0], "17")
+                    self.load_nse_icon = False
+                    return
+                if is_windows_10:
+                    try:
+                        icon_ico_raw: Optional[requests.Response] = requests.get(self.url_icon_ico,
+                                                                                 headers=self.headers, stream=True)
+                        if icon_ico_raw is None:
+                            self.icon_ico_path = None
+                            return
+                        with open('.NSE-OCA.ico', 'wb') as f:
+                            for chunk in icon_ico_raw.iter_content(1024):
+                                f.write(chunk)
+                        self.icon_ico_path = '.NSE-OCA.ico'
+                    except Exception as err:
+                        print(err, sys.exc_info()[0], "18")
+                        self.icon_ico_path = None
+                        return
 
     def check_for_updates(self, auto: bool = True) -> None:
         release_data: requests.Response = requests.get(
