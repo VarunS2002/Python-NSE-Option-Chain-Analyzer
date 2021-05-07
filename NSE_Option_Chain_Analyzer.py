@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 13)
+    beta: Tuple[bool, int] = (True, 14)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -55,7 +55,7 @@ class Nse:
                           'like Gecko) Chrome/80.0.3987.149 Safari/537.36',
             'accept-language': 'en,gu;q=0.9,hi;q=0.8',
             'accept-encoding': 'gzip, deflate, br'}
-        self.get_symbols()
+        self.get_symbols(window)
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.create_config(new=True) if not os.path.isfile('NSE-OCA.ini') else None
         self.get_config()
@@ -75,17 +75,29 @@ class Nse:
         self.get_icon()
         self.login_win(window)
 
-    def get_symbols(self) -> None:
+    def get_symbols(self, window: Tk) -> None:
+        def create_error_window(error_window: Tk):
+            error_window.title("NSE-Option-Chain-Analyzer")
+            window_width: int = error_window.winfo_reqwidth()
+            window_height: int = error_window.winfo_reqheight()
+            position_right: int = int(error_window.winfo_screenwidth() / 2 - window_width / 2)
+            position_down: int = int(error_window.winfo_screenheight() / 2 - window_height / 2)
+            error_window.geometry("320x160+{}+{}".format(position_right, position_down))
+            messagebox.showerror(title="Error", message="Failed to fetch Symbols.\nThe program will now exit.")
+            error_window.destroy()
+
         try:
             symbols_information: requests.Response = requests.get(self.url_symbols, headers=self.headers)
         except Exception as err:
             print(err, sys.exc_info()[0], "19")
+            create_error_window(window)
             sys.exit()
         symbols_information_soup: bs4.BeautifulSoup = bs4.BeautifulSoup(symbols_information.content, "html.parser")
         try:
             symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
         except IndexError as err:
             print(err, sys.exc_info()[0], "20")
+            create_error_window(window)
             sys.exit()
         symbols_table_rows: List[bs4.element.Tag] = list(symbols_table.findChildren(['th', 'tr']))
         symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows) - 1)]
