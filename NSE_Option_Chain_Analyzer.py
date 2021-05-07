@@ -26,8 +26,8 @@ if is_windows_10:
 
 # noinspection PyAttributeOutsideInit
 class Nse:
-    version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 16)
+    version: str = '5.3'
+    beta: Tuple[bool, int] = (False, 0)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
