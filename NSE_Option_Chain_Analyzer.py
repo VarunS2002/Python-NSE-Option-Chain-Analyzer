@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.2'
-    beta: Tuple[bool, int] = (True, 14)
+    beta: Tuple[bool, int] = (True, 15)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -50,6 +50,8 @@ class Nse:
                                  "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
         self.url_icon_ico: str = "https://raw.githubusercontent.com/VarunS2002/" \
                                  "Python-NSE-Option-Chain-Analyzer/master/nse_logo.ico"
+        self.url_update: str = "https://api.github.com/repos/VarunS2002/" \
+                               "Python-NSE-Option-Chain-Analyzer/releases/latest"
         self.headers: Dict[str, str] = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) Chrome/80.0.3987.149 Safari/537.36',
@@ -159,10 +161,17 @@ class Nse:
                         return
 
     def check_for_updates(self, auto: bool = True) -> None:
-        release_data: requests.Response = requests.get(
-            "https://api.github.com/repos/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/latest",
-            headers=self.headers, timeout=5)
-        latest_version: str = release_data.json()['tag_name']
+        try:
+            release_data: requests.Response = requests.get(self.url_update, headers=self.headers, timeout=5)
+            latest_version: str = release_data.json()['tag_name']
+            float(latest_version)
+        except Exception as err:
+            print(err, sys.exc_info()[0], "21")
+            if not auto:
+                self.info.attributes('-topmost', False)
+                messagebox.showerror(title="Error", message="Failed to check for updates.")
+                self.info.attributes('-topmost', True)
+            return
 
         if float(latest_version) > float(Nse.version):
             self.info.attributes('-topmost', False) if not auto else None
