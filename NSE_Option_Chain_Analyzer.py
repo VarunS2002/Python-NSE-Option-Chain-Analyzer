@@ -1076,19 +1076,18 @@ class Nse:
         df = df.transpose()
 
         ce_values: List[dict] = [data['CE'] for data in json_data['records']['data'] if
-                                 "CE" in data and str(data['expiryDate'].lower() == str(self.expiry_date).lower())]
+                                 "CE" in data and str(data['expiryDate']).lower() == str(self.expiry_date).lower()]
         pe_values: List[dict] = [data['PE'] for data in json_data['records']['data'] if
-                                 "PE" in data and str(data['expiryDate'].lower() == str(self.expiry_date).lower())]
+                                 "PE" in data and str(data['expiryDate']).lower() == str(self.expiry_date).lower()]
         points: float = pe_values[0]['underlyingValue']
         if points == 0:
             for item in pe_values:
                 if item['underlyingValue'] != 0:
                     points = item['underlyingValue']
                     break
-        ce_data: pandas.DataFrame = pandas.DataFrame(ce_values)
-        pe_data: pandas.DataFrame = pandas.DataFrame(pe_values)
-        ce_data_f: pandas.DataFrame = ce_data.loc[ce_data['expiryDate'] == self.expiry_date]
-        pe_data_f: pandas.DataFrame = pe_data.loc[pe_data['expiryDate'] == self.expiry_date]
+        ce_data_f: pandas.DataFrame = pandas.DataFrame(ce_values)
+        pe_data_f: pandas.DataFrame = pandas.DataFrame(pe_values)
+
         if ce_data_f.empty:
             messagebox.showerror(title="Error",
                                  message="Invalid Expiry Date.\nPlease restart and enter a new Expiry Date.")
