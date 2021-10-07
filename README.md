@@ -1,6 +1,6 @@
 <img width="128" height="128" src="https://i.imgur.com/OGHZnUu.png" alt="icon_square">
 
-# Python NSE-Option-Chain-Analyzer
+# Python-NSE-Option-Chain-Analyzer
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 
@@ -29,20 +29,26 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 ## Installation:
 
-> #### Method 1 (Windows):
+> ### Supported platforms:
+
+- Windows
+- Linux
+- macOS
+
+> #### Method 1 (Windows only):
 
 - Download the `.exe` (Windows Executable) file
 
 - Run it directly
 
-> #### Method 2 (Windows and Linux):
+> #### Method 2:
 
 - Requirements:
     - Python 3.6+
     - Additional steps for Linux:
         - `apt-get install python3-tk`
         - `apt install python3-pip`
-    - For Windows https://www.python.org/downloads/ is recommended
+    - For Windows and macOS https://www.python.org/downloads/ is recommended
 
 - Download the `.py` (Python Source Code) file
 
@@ -50,6 +56,8 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
   modules: [requirements.txt](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/blob/master/requirements.txt)
 
 - Install missing modules using `pip install -r requirements.txt`
+
+> #### Note: Alternate implementations of Python and/or alternate methods of installation may also be supported
 
 ## Usage:
 
@@ -65,7 +73,7 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 6. Click Start
 
-## Note:
+## Notes:
 
 - If there is an error in fetching dates on login screen then try refreshing
 
@@ -77,26 +85,13 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 - In case of network or connection errors the program doesn't crash and will keep retrying until manually stopped
 
-- If a ZeroDivisionError occurs or some data doesn't exist the value of the variable will be defaulted to 0
+- If a `ZeroDivisionError` occurs or some data doesn't exist the value of the variable will be defaulted to `0`
 
 - Set `load_nse_icon` option to `False` in the configuration file to prevent downloading the NSE icon in the `.py`
   version to speed up loading time
 
-## Dependencies:
-
-- [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
-
-- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/) is used for scraping the list of stocks and indices
-
-- [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
-
-- [requests](https://pypi.org/project/requests/) is used for accessing and retrieving data from the NSE website
-
-- [stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
-
-- [tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
-
-- [win10toast](https://pypi.org/project/win10toast/) is used for Windows 10 Toast notifications
+- If an `Incorrect Strike Price` error message is displayed and the strike price you entered is correct then check
+  whether the NSE website is loading the data properly before creating an issue
 
 ## Features:
 
@@ -106,6 +101,8 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 - Supported Indices and
   Stocks: https://www.nseindia.com/products-services/equity-derivatives-list-underlyings-information
+
+- Option Chain data source: https://www.nseindia.com/option-chain
 
 - Supports multiple instances with different indices/stocks and/or strike prices selected
 
@@ -211,6 +208,28 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
   <br>![Option_Menu](https://i.imgur.com/CocgjbN.png) <br><br>
 
-- Notification:
+- Toast Notifications (Windows 10 only):
 
   <br>![Notification](https://i.imgur.com/d3Fokxo.png) <br><br>
+
+## Dependencies:
+
+- [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
+
+- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/) is used for scraping the list of stocks and indices
+
+- [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
+
+- [requests](https://pypi.org/project/requests/) is used for accessing and retrieving data from the NSE website
+
+- [stream-to-logger](https://pypi.org/project/streamtologger/) is used for debug logging
+
+- [tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
+
+- [win10toast](https://pypi.org/project/win10toast/) is used for toast notifications on Windows 10
+
+## Contributors:
+
+- [medknecth](https://github.com/medknecth/)
+
+- [Sangram2905](https://github.com/Sangram2905/)
