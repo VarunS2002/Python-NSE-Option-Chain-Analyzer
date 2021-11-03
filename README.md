@@ -108,7 +108,7 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 - Red and Green colour indication for data based on trends
 
-- Toast Notifications for notifying when trend changes (Windows 10 only). Notified changes:
+- Toast Notifications for notifying when trend changes (Windows 10 and 11 only). Notified changes:
     * Open Interest: Bullish/Bearish
     * Open Interest Upper Boundary Strike Prices: Change in Value
     * Open Interest Lower Boundary Strike Prices: Change in Value
@@ -208,7 +208,7 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
   <br>![Option_Menu](https://i.imgur.com/CocgjbN.png) <br><br>
 
-- Toast Notifications (Windows 10 only):
+- Toast Notifications (Windows 10 and 11 only):
 
   <br>![Notification](https://i.imgur.com/d3Fokxo.png) <br><br>
 
@@ -226,7 +226,7 @@ Put In The Money(ITM) | This indicates if the Put writers are also exiting far O
 
 - [tksheet](https://pypi.org/project/tksheet/) is used for the table containing the data
 
-- [win10toast](https://pypi.org/project/win10toast/) is used for toast notifications on Windows 10
+- [win10toast](https://pypi.org/project/win10toast/) is used for toast notifications on Windows 10 and 11
 
 ## Contributors:
 
