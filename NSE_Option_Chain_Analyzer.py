@@ -1314,7 +1314,7 @@ class Nse:
                                                   self.put_sum, self.difference,
                                                   self.call_boundary, self.put_boundary, self.call_itm,
                                                   self.put_itm]
-        self.sheet.insert_row(values=output_values)
+        self.sheet.insert_row(values=output_values, add_columns=True) #add_columns was defaulted to false in v5.0.29 of tksheet
         if self.live_export:
             self.export_row(output_values)
 
