@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.3'
-    beta: Tuple[bool, int] = (True, 3)
+    beta: Tuple[bool, int] = (True, 4)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -1077,9 +1077,9 @@ class Nse:
         df = df.transpose()
 
         ce_values: List[dict] = [data['CE'] for data in json_data['records']['data'] if
-                                 "CE" in data and str(data['expiryDate']).lower() == str(self.expiry_date).lower()]
+                                 "CE" in data and data['expiryDate'].lower() == self.expiry_date.lower()]
         pe_values: List[dict] = [data['PE'] for data in json_data['records']['data'] if
-                                 "PE" in data and str(data['expiryDate']).lower() == str(self.expiry_date).lower()]
+                                 "PE" in data and data['expiryDate'].lower() == self.expiry_date.lower()]
         points: float = pe_values[0]['underlyingValue']
         if points == 0:
             for item in pe_values:
