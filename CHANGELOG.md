@@ -2,6 +2,28 @@
 
 <br>
 
+> # [5.4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.4)
+
+## Bug Fix Update
+
+- Fixed `IndexError` with tksheet versions `>=5.0.29`.
+  Issue: [#24](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/24)
+  , [#25](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/25)
+  , [#28](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/28)
+  , [#32](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/32)
+  and [#33](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/33). Pull
+  Request: [#34](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/pull/34) (Thanks
+  to [@yjagota](https://github.com/yjagota/))
+- Fixed redundant code. Pull Request: [#19](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/pull/19)
+  (Thanks to [@QuickLearner171998](https://github.com/QuickLearner171998/))
+- Bumped dependencies to fix known vulnerabilities
+- Updated documentation:
+    - Added new contributors to the list
+    - Updated table formatting
+    - Fixed typos
+
+<br>
+
 > # [5.3](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.3)
 
 ## Feature and Bug Fix Update
@@ -230,7 +252,7 @@
 
 - Now compatible with the new NSE website
 - Instead of scraping the data from the html the program now calculates the data from a json file which is also the
-  implementation of the new website (Thanks to @medknecth)
+  implementation of the new website (Thanks to [@medknecth](https://github.com/medknecth/))
 - Since the values on the new website display contracts instead of shares, the values in the program have been updated
   to display in thousands instead of lacs
 - Completely reworked the main code

@@ -4,7 +4,7 @@
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 
-[![Latest: v5.3](https://img.shields.io/badge/release-v5.3-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.3/NSE_Option_Chain_Analyzer_5.3.exe)
+[![Latest: v5.4](https://img.shields.io/badge/release-v5.4-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.4/NSE_Option_Chain_Analyzer_5.4.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
