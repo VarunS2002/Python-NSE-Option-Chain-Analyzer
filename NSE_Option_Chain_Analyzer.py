@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.3'
-    beta: Tuple[bool, int] = (True, 1)
+    beta: Tuple[bool, int] = (True, 2)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -464,7 +464,7 @@ class Nse:
         self.login.columnconfigure(2, weight=1)
 
         self.intervals_var: StringVar = StringVar()
-        self.intervals_var.set(self.intervals[0])
+        self.intervals_var.set(str(self.intervals[0]))
         self.index_var: StringVar = StringVar()
         self.index_var.set(self.indices[0])
         self.stock_var: StringVar = StringVar()
@@ -505,7 +505,8 @@ class Nse:
         intervals_label: Label = Label(self.login, text="Refresh Interval (in min): ", justify=LEFT)
         intervals_label.grid(row=5, column=0, sticky=N + S + W)
         self.intervals_menu: Combobox = Combobox(self.login, textvariable=self.intervals_var,
-                                                 values=tuple(self.intervals), state="readonly")
+                                                 values=[str(interval) for interval in self.intervals],
+                                                 state="readonly")
         self.intervals_menu.config(width=15)
         self.intervals_menu.grid(row=5, column=1, sticky=N + S + E)
         self.intervals_menu.current(self.intervals.index(int(self.seconds / 60)))
