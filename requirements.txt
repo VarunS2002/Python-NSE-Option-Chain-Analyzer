@@ -1,6 +1,6 @@
-beautifulsoup4>=4.9.3
-pandas>=1.2.4
-requests>=2.24.0
+beautifulsoup4>=4.10.0
+pandas>=1.4.1
+requests>=2.27.1
 streamtologger>=2017.1
-tksheet>=5.0.24
+tksheet>=5.3.2
 win10toast>=0.9; platform_system == "Windows" and platform_release == "10"
