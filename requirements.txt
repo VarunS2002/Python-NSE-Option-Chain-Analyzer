@@ -2,5 +2,5 @@ beautifulsoup4>=4.9.3
 pandas>=1.2.4
 requests>=2.24.0
 streamtologger>=2017.1
-tksheet==5.0.24
+tksheet>=5.0.24
 win10toast>=0.9; platform_system == "Windows" and platform_release == "10"
