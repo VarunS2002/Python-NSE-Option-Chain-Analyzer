@@ -27,7 +27,7 @@ if is_windows_10:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.3'
-    beta: Tuple[bool, int] = (False, 0)
+    beta: Tuple[bool, int] = (True, 1)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -1314,7 +1314,7 @@ class Nse:
                                                   self.put_sum, self.difference,
                                                   self.call_boundary, self.put_boundary, self.call_itm,
                                                   self.put_itm]
-        self.sheet.insert_row(values=output_values)
+        self.sheet.insert_row(values=output_values, add_columns=True)
         if self.live_export:
             self.export_row(output_values)
 
