@@ -18,8 +18,8 @@ import streamtologger
 import tksheet
 
 is_windows: bool = platform.system() == "Windows"
-is_windows_10: bool = is_windows and platform.release() == "10"
-if is_windows_10:
+is_windows_10_or_11: bool = is_windows and platform.release() == "10"
+if is_windows_10_or_11:
     # noinspection PyUnresolvedReferences
     import win10toast
 
@@ -73,7 +73,7 @@ class Nse:
             f'Call Boundary ({self.units_str})', f'Put Boundary ({self.units_str})', 'Call ITM', 'Put ITM')
         self.session: requests.Session = requests.Session()
         self.cookies: Dict[str, str] = {}
-        self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10 else None
+        self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10_or_11 else None
         self.get_icon()
         self.login_win(window)
 
@@ -147,7 +147,7 @@ class Nse:
                     print(err, sys.exc_info()[0], "17")
                     self.load_nse_icon = False
                     return
-                if is_windows_10:
+                if is_windows_10_or_11:
                     try:
                         icon_ico_raw: requests.Response = requests.get(self.url_icon_ico,
                                                                        headers=self.headers, stream=True)
@@ -248,12 +248,12 @@ class Nse:
                 self.save_oc: bool = self.config_parser.getboolean('main', 'save_oc')
             try:
                 self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
-                    if is_windows_10 else False
+                    if is_windows_10_or_11 else False
             except (configparser.NoOptionError, ValueError) as err:
                 print(err, sys.exc_info()[0], "0")
                 self.create_config(attribute="notifications")
                 self.notifications: bool = self.config_parser.getboolean('main', 'notifications') \
-                    if is_windows_10 else False
+                    if is_windows_10_or_11 else False
             try:
                 self.auto_stop: bool = self.config_parser.getboolean('main', 'auto_stop')
             except (configparser.NoOptionError, ValueError) as err:
@@ -922,7 +922,7 @@ class Nse:
                                  accelerator="(Ctrl+O)", command=self.toggle_save_oc)
         self.options.add_command(label=f"Notifications: {'On' if self.notifications else 'Off'}",
                                  accelerator="(Ctrl+N)", command=self.toggle_notifications,
-                                 state=NORMAL if is_windows_10 else DISABLED)
+                                 state=NORMAL if is_windows_10_or_11 else DISABLED)
         self.options.add_command(label=f"Stop automatically at 3:30pm: {'On' if self.auto_stop else 'Off'}",
                                  accelerator="(Ctrl+K)", command=self.toggle_auto_stop)
         self.options.add_command(label=f"Warn Late Server Updates: {'On' if self.warn_late_update else 'Off'}",
@@ -941,7 +941,7 @@ class Nse:
         self.root.bind('<Control-s>', self.export)
         self.root.bind('<Control-b>', self.toggle_live_export)
         self.root.bind('<Control-o>', self.toggle_save_oc)
-        self.root.bind('<Control-n>', self.toggle_notifications) if is_windows_10 else None
+        self.root.bind('<Control-n>', self.toggle_notifications) if is_windows_10_or_11 else None
         self.root.bind('<Control-k>', self.toggle_auto_stop)
         self.root.bind('<Control-w>', self.toggle_warn_late_update)
         self.root.bind('<Control-u>', self.toggle_updates)
