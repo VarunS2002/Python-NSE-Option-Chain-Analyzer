@@ -292,3 +292,4 @@
 - New data is printed only if the server time has changed (To prevent printing duplicate data)
 - Check README.md to see what data is printed and how it's calculated
 - PEP 8 format
+- 
