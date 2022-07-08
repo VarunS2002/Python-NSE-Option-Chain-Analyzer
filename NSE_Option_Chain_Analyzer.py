@@ -27,7 +27,6 @@ if is_windows_10_or_11:
 # noinspection PyAttributeOutsideInit
 class Nse:
     version: str = '5.4'
-    beta: Tuple[bool, int] = (False, 0)
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]
@@ -769,17 +768,9 @@ class Nse:
             try:
                 # noinspection PyProtectedMember,PyUnresolvedReferences
                 base_path: str = sys._MEIPASS
-                print(platform.system() + ' ' + platform.release() + ' .exe version ' + Nse.version, end=' ')
-                if Nse.beta[0]:
-                    print(f"beta {Nse.beta[1]}")
-                else:
-                    print()
+                print(platform.system() + ' ' + platform.release() + ' .exe version ' + Nse.version)
             except AttributeError:
-                print(platform.system() + ' ' + platform.release() + ' .py version ' + Nse.version, end=' ')
-                if Nse.beta[0]:
-                    print(f"beta {Nse.beta[1]}")
-                else:
-                    print()
+                print(platform.system() + ' ' + platform.release() + ' .py version ' + Nse.version)
                 if not self.load_nse_icon:
                     print("NSE icon loading disabled")
 
