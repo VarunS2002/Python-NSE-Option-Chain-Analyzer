@@ -4,7 +4,7 @@
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 
-[![Latest: v5.4](https://img.shields.io/badge/release-v5.4-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.4/NSE_Option_Chain_Analyzer_5.4.exe)
+[![Latest: v5.5](https://img.shields.io/badge/release-v5.5-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.5/NSE_Option_Chain_Analyzer_5.5.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -163,8 +163,8 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 
 | Data                   | Description                                                                                                                                                                                                                                                                             |
 |------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Server Time            | Web Scraped. Indicates last data update time by NSE server                                                                                                                                                                                                                              |
-| Value                  | Web Scraped. Underlying Instrument Value indicates the value of the underlying Security or Index                                                                                                                                                                                        |
+| Server Time            | Indicates last data update time by NSE server                                                                                                                                                                                                                                           |
+| Value                  | Underlying Instrument Value indicates the value of the underlying Security or Index                                                                                                                                                                                                     |
 | Call Sum               | Calculated. Sum of the Changes in Call Open Interest contracts of the given Strike Price and the next immediate two Strike Prices (In Thousands for Index Mode and Tens for Stock Mode)                                                                                                 |
 | Put Sum                | Calculated. Sum of the Change in Put Open Interest contracts of the given Strike Price and the next two Strike Prices (In Thousands for Index Mode and Tens for Stock Mode)                                                                                                             |
 | Difference             | Calculated. Difference between the Call Sum and Put Sum. If it's very -ve it's bullish, if it's very +ve then it's bearish else it's a sideways session.                                                                                                                                |
@@ -215,8 +215,6 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 ## Dependencies:
 
 - [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) is used for compiling the program to a .exe file
-
-- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/) is used for scraping the list of stocks and indices
 
 - [pandas](https://pypi.org/project/pandas/) is used for storing and manipulating the data
 

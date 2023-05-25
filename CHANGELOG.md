@@ -2,6 +2,22 @@
 
 <br>
 
+> # [5.5](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.5)
+
+## Bug Fix Update
+
+- Fixed `IndexError` caused by NSE updating the method they use for loading symbols on their website.
+  Issue: [#54](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/54)
+  , [#55](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/55)
+  , [#56](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/56)
+- No longer uses the web scraping technique to load symbols
+    - Instead uses the API to load symbols as that is what the new NSE website uses
+    - Removed `beautifulsoup4` from `requirements.txt` as it is no longer required
+- Updated documentation:
+    - Removed `beautifulsoup4` from dependencies
+
+<br>
+
 > # [5.4](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.4)
 
 ## Bug Fix Update
