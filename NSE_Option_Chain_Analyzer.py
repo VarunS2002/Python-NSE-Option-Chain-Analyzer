@@ -11,7 +11,6 @@ from tkinter import Tk, Toplevel, Event, TclError, StringVar, Frame, Menu, Label
 from tkinter.ttk import Combobox, Button
 from typing import Union, Optional, List, Dict, Tuple, TextIO, Any
 
-import bs4
 import pandas
 import requests
 import streamtologger
@@ -43,8 +42,7 @@ class Nse:
         self.url_oc: str = "https://www.nseindia.com/option-chain"
         self.url_index: str = "https://www.nseindia.com/api/option-chain-indices?symbol="
         self.url_stock: str = "https://www.nseindia.com/api/option-chain-equities?symbol="
-        self.url_symbols: str = "https://www.nseindia.com/products-services/" \
-                                "equity-derivatives-list-underlyings-information"
+        self.url_symbols: str = "https://www.nseindia.com/api/underlying-information"
         self.url_icon_png: str = "https://raw.githubusercontent.com/VarunS2002/" \
                                  "Python-NSE-Option-Chain-Analyzer/master/nse_logo.png"
         self.url_icon_ico: str = "https://raw.githubusercontent.com/VarunS2002/" \
@@ -56,6 +54,8 @@ class Nse:
                           'like Gecko) Chrome/80.0.3987.149 Safari/537.36',
             'accept-language': 'en,gu;q=0.9,hi;q=0.8',
             'accept-encoding': 'gzip, deflate, br'}
+        self.session: requests.Session = requests.Session()
+        self.cookies: Dict[str, str] = {}
         self.get_symbols(window)
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.create_config(new=True) if not os.path.isfile('NSE-OCA.ini') else None
@@ -70,8 +70,6 @@ class Nse:
             'Time', 'Value', f'Call Sum ({self.units_str})', f'Put Sum ({self.units_str})',
             f'Difference ({self.units_str})',
             f'Call Boundary ({self.units_str})', f'Put Boundary ({self.units_str})', 'Call ITM', 'Put ITM')
-        self.session: requests.Session = requests.Session()
-        self.cookies: Dict[str, str] = {}
         self.toaster: win10toast.ToastNotifier = win10toast.ToastNotifier() if is_windows_10_or_11 else None
         self.get_icon()
         self.login_win(window)
@@ -88,41 +86,23 @@ class Nse:
             error_window.destroy()
 
         try:
-            symbols_information: requests.Response = requests.get(self.url_symbols, headers=self.headers)
+            request: requests.Response = self.session.get(self.url_oc, headers=self.headers, timeout=5)
+            self.cookies = dict(request.cookies)
+            response: requests.Response = self.session.get(self.url_symbols, headers=self.headers, timeout=5,
+                                                           cookies=self.cookies)
         except Exception as err:
             print(err, sys.exc_info()[0], "19")
             create_error_window(window)
             sys.exit()
-        symbols_information_soup: bs4.BeautifulSoup = bs4.BeautifulSoup(symbols_information.content, "html.parser")
         try:
-            symbols_table: bs4.element.Tag = symbols_information_soup.findChildren('table')[0]
-        except IndexError as err:
+            json_data: Dict[str, Dict[str, List[Dict[str, Union[str, int]]]]] = response.json()
+        except Exception as err:
+            print(response)
             print(err, sys.exc_info()[0], "20")
             create_error_window(window)
             sys.exit()
-        symbols_table_rows: List[bs4.element.Tag] = list(symbols_table.findChildren(['th', 'tr']))
-        symbols_table_rows_str: List[str] = ['' for _ in range(len(symbols_table_rows) - 1)]
-        for column in range(len(symbols_table_rows) - 1):
-            symbols_table_rows_str[column] = str(symbols_table_rows[column])
-        divider_row: str = '<tr>\n' \
-                           '<td colspan="3"><strong>Derivatives on Individual Securities</strong></td>\n' \
-                           '</tr>'
-        for column in range(4, symbols_table_rows_str.index(divider_row) + 1):
-            cells: bs4.element.ResultSet = symbols_table_rows[column].findChildren('td')
-            column: int = 0
-            for cell in cells:
-                if column == 2:
-                    self.indices.append(cell.string)
-                column += 1
-        for column in reversed(range(symbols_table_rows_str.index(divider_row) + 1)):
-            symbols_table_rows.pop(column)
-        for row in symbols_table_rows:
-            cells: bs4.element.ResultSet = row.findChildren('td')
-            column: int = 0
-            for cell in cells:
-                if column == 2:
-                    self.stocks.append(cell.string)
-                column += 1
+        self.indices = [item['symbol'] for item in json_data['data']['IndexList']]
+        self.stocks = [item['symbol'] for item in json_data['data']['UnderlyingList']]
 
     def get_icon(self) -> None:
         self.icon_png_path: str
@@ -331,7 +311,6 @@ class Nse:
             return self.get_data_refresh()
 
     def get_data_first_run(self) -> Optional[Tuple[Optional[requests.Response], Any]]:
-        request: Optional[requests.Response] = None
         response: Optional[requests.Response] = None
         self.units_str = 'in K' if self.option_mode == 'Index' else 'in 10s'
         self.output_columns: Tuple[str, str, str, str, str, str, str, str, str] = (
@@ -354,11 +333,8 @@ class Nse:
 
         url: str = self.url_index + self.index if self.option_mode == 'Index' else self.url_stock + self.stock
         try:
-            request = self.session.get(self.url_oc, headers=self.headers, timeout=5)
-            self.cookies = dict(request.cookies)
             response = self.session.get(url, headers=self.headers, timeout=5, cookies=self.cookies)
         except Exception as err:
-            print(request)
             print(response)
             print(err, sys.exc_info()[0], "1")
             messagebox.showerror(title="Error", message="Error in fetching dates.\nPlease retry.")
@@ -367,7 +343,7 @@ class Nse:
             self.date_menu.config(values=tuple(self.dates))
             self.date_menu.current(0)
             return
-        json_data: Any
+        json_data: Dict[str, Any]
         if response is not None:
             try:
                 json_data = response.json()
@@ -540,8 +516,6 @@ class Nse:
             self.option_mode_btn.config(text='Index')
             self.index_menu.config(state='readonly')
             self.stock_menu.config(state=DISABLED)
-
-        self.get_data()
 
         self.config_parser.set('main', 'option_mode', f'{self.option_mode}')
         with open('NSE-OCA.ini', 'w') as f:
