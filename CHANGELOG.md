@@ -2,6 +2,23 @@
 
 <br>
 
+> # [5.8](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.8)
+
+## Bug Fix Update
+
+- Bug Fixes:
+    - Another attempt to fix crash likely caused by NSE Servers sending malformed data.
+      Thanks [@chettyrajesh](https://github.com/chettyrajesh/) for this workaround.
+      This is what causes the "Error in fetching dates.Please retry." error.
+      Issue: [#82](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/82)
+      , [#81](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/81)
+      , [#79](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/79)
+      , [#65](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/issues/65)
+- Updated documentation:
+    - Added new contributor to the list
+
+<br>
+
 > # [5.7](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/tag/5.7)
 
 ## Bug Fix Update

@@ -27,7 +27,7 @@ if is_windows_10_or_11:
 
 # noinspection PyAttributeOutsideInit
 class Nse:
-    version: str = '5.7'
+    version: str = '5.8'
 
     def __init__(self, window: Tk) -> None:
         self.intervals: List[int] = [1, 2, 3, 5, 10, 15]

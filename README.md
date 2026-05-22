@@ -4,7 +4,7 @@
 
 ## [Downloads](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases)
 
-[![Latest: v5.7](https://img.shields.io/badge/release-v5.7-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.7/NSE_Option_Chain_Analyzer_5.7.exe)
+[![Latest: v5.8](https://img.shields.io/badge/release-v5.8-brightgreen)](https://github.com/VarunS2002/Python-NSE-Option-Chain-Analyzer/releases/download/5.8/NSE_Option_Chain_Analyzer_5.8.exe)
 ![Download-Count](https://img.shields.io/github/downloads/VarunS2002/Python-NSE-Option-Chain-Analyzer/total?color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -237,3 +237,5 @@ on [Mr. Sameer Dharaskar's Course](http://advancesharetrading.com/).
 - [yjagota](https://github.com/yjagota/)
 
 - [QuickLearner171998](https://github.com/QuickLearner171998/)
+
+- [chettyrajesh](https://github.com/chettyrajesh/)
